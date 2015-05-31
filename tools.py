@@ -4,10 +4,15 @@ import sys
 import subprocess
 
 
-COMMANDS_LIST = ('release',)
+COMMANDS_LIST = ('register', 'release')
 COMMANDS_INFO = {
-    'release': 'make distributive and upload to pypi (setup.py sdist upload)'
+    'register': 'register package to pypi (setup.py register)',
+    'release': 'make distributive and upload to pypi (setup.py sdist upload)',
 }
+
+
+def register(*args):
+    subprocess.call(['python', 'setup.py', 'register'])
 
 
 def release(*args):
