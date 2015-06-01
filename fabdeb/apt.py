@@ -3,38 +3,8 @@ from fabdeb.fab_tools import print_green
 from fabric.operations import sudo, put
 
 
-APT_REPOSITORIES = {
-    'Debian GNU/Linux 8': {
-        ('8.0',): (
-            'deb http://ftp.us.debian.org/debian jessie main contrib non-free\n'
-            'deb-src http://ftp.us.debian.org/debian jessie main contrib non-free\n'
-            '\n'
-            'deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free\n'
-            'deb-src http://ftp.debian.org/debian/ jessie-updates main contrib non-free\n'
-            '\n'
-            'deb http://security.debian.org/ jessie/updates main contrib non-free\n'
-            'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'
-            '\n'
-            'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n'
-            '\n'
-            'deb http://nginx.org/packages/debian/ jessie nginx\n'
-            'deb-src http://nginx.org/packages/debian/ jessie nginx\n'),
-    },
-}
-
-
-APT_REPO_INSTALL_KEYS_COMMANDS = {
-    'Debian GNU/Linux 8': {
-        ('8.0',): (
-            'wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -',
-            'wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',
-        ),
-    },
-}
-
-
-def get_apt_repositories_text(os_issue, os_ver):
-    t = APT_REPOSITORIES.get(os_issue)
+def get_apt_repositories_text(repos, os_issue, os_ver):
+    t = repos.get(os_issue)
     if t:
         for versions, text in t.iteritems():
             if os_ver in versions:
@@ -42,8 +12,8 @@ def get_apt_repositories_text(os_issue, os_ver):
     raise RuntimeError('Does not exists apt repositories for "{}" version "{}"'.format(os_issue, os_ver))
 
 
-def get_apt_repo_install_keys_commands(os_issue, os_ver):
-    t = APT_REPO_INSTALL_KEYS_COMMANDS.get(os_issue)
+def get_apt_repo_install_keys_commands(repos_install_keys_commands, os_issue, os_ver):
+    t = repos_install_keys_commands.get(os_issue)
     if t:
         for versions, commands in t.iteritems():
             if os_ver in versions:
@@ -54,11 +24,18 @@ def get_apt_repo_install_keys_commands(os_issue, os_ver):
 # # # COMMANDS # # #
 
 
-def set_apt_repositories(os_issue, os_ver):
+def set_apt_repositories(repos, repos_install_keys_commands, os_issue, os_ver, subconf_name=None):
     print_green('INFO: Set apt repositories...')
-    sudo('mv /etc/apt/sources.list /etc/apt/sources.list.bak', warn_only=True)
-    put(StringIO(get_apt_repositories_text(os_issue, os_ver)), '/etc/apt/sources.list', mode=0644, use_sudo=True)
-    for command in get_apt_repo_install_keys_commands(os_issue, os_ver):
+    repositories_f = StringIO(get_apt_repositories_text(repos, os_issue, os_ver))
+    if subconf_name:
+        put(repositories_f,
+            '/etc/apt/sources.list.d/{}.list'.format(subconf_name.strip()),
+            mode=0644, use_sudo=True)
+    else:
+        sudo('mv /etc/apt/sources.list /etc/apt/sources.list.bak', warn_only=True)
+        put(repositories_f, '/etc/apt/sources.list',
+            mode=0644, use_sudo=True)
+    for command in get_apt_repo_install_keys_commands(repos_install_keys_commands, os_issue, os_ver):
         sudo(command)
     print_green('INFO: Set apt repositories... OK')
 

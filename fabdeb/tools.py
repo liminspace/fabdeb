@@ -25,3 +25,25 @@ def install_pngquant():
     with cd('/tmp'):
         sudo('rm -rf pngquant-master')
     print_green('INFO: Install pngquant...  OK')
+
+
+def install_supervisor():
+    if not confirm('Do you want to install supervisor?'):
+        return
+    print_green('INFO: Install supervisor...')
+    apt_install(('supervisor',))
+    print_green('INFO: Install supervisor... OK')
+
+
+def reboot():
+    if not confirm('Do you want to reboot server?'):
+        return
+    sudo('shutdown -r now')
+
+
+def install_proftpd():
+    if not confirm('Do you want to install proftpd?'):
+        return
+    print_green('INFO: Install proftpd...')
+    apt_install(('proftpd',))
+    print_green('INFO: Install proftpd... OK')
