@@ -8,7 +8,7 @@ from fabdeb.tools import install_pngquant, install_supervisor, reboot, install_p
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 @task
@@ -18,7 +18,7 @@ def prepare_server():
     set_apt_repositories(OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver)
     apt_update()
     apt_upgrade()
-    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential'))
+    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core'))
     # python common
     apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'))
     # for python pillow
