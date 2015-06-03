@@ -103,6 +103,23 @@ def configure_timezone():
     print_green('INFO: Configure timezone... OK')
 
 
+def user_exists(username):
+    return exists('/home/{}'.format(username), use_sudo=True)
+
+
+def add_user(username, skip_confirm=False):
+    if user_exists(username):
+        abort('User {} exists'.format(username))
+    if not skip_confirm:
+        if not confirm('Do you want to create new user?'):
+            return
+    print_green('INFO: Add system user "{}"...'.format(username))
+    sudo('adduser {}'.format(username))
+    from fabdeb.tools import add_user_to_proftpd
+    add_user_to_proftpd(username)
+    print_green('INFO: Add system user "{}"... OK'.format(username))
+
+
 def install_ntp():
     if not confirm('Do you want install NTP client?'):
         return
@@ -162,7 +179,7 @@ def install_exim4():
         apt_install(('opendkim', 'opendkim-tools'))
         sudo('mkdir {}'.format(dkim_keys_path), warn_only=True)
         sudo('chown Debian-exim:Debian-exim {dkp} && chmod 700 {dkp}'.format(dkp=dkim_keys_path))
-        dkim_selector = prompt('Set DKIM selector name', default='mail', validate='[\w]+')
+        dkim_selector = prompt('Set DKIM selector name', default='mail', validate=r'[\w]+')
         sudo('cp /etc/exim4/exim4.conf.template /etc/exim4/exim4.conf.template.bak')
         t = StringIO()
         get('/etc/exim4/exim4.conf.template', local_path=t, use_sudo=True)
@@ -196,5 +213,5 @@ def install_exim4():
                   'For test sending mail run:\n'
                   '    # echo testmail | /usr/sbin/sendmail you.real.email@maildomain.com\n'
                   ''.format(dkp=dkim_keys_path, dsn=dkim_selector))
-        sudo('service exim4 restart')
+        sudo('service exim4 restart', warn_only=True)
     print_green('INFO: Install exim4... OK')

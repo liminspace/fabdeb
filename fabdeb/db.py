@@ -1,6 +1,6 @@
 import re
 from fabric.network import prompt_for_password
-from fabdeb import set_apt_repositories, apt_update, apt_install
+from fabdeb.apt import set_apt_repositories, apt_update, apt_install
 from fabdeb.fab_tools import print_green, print_red
 from fabric.context_managers import cd, hide
 from fabric.contrib.console import confirm
