@@ -1,5 +1,7 @@
 import re
+import socket
 from StringIO import StringIO
+from fabric.state import env
 from fabdeb.apt import apt_install
 from fabdeb.fab_tools import print_green, print_red, print_yellow
 from fabric.contrib.console import confirm
@@ -66,7 +68,7 @@ def setup_swap():
     print_green('INFO: Setup SWAP...')
     t = sudo('swapon -s', quiet=True)
     if not re.search(r'\s\d+\s', t):
-        swap_size = int(prompt("Server doesn't have SWAP. Write size in MB to create SWAP. Keep 0 to skip.",
+        swap_size = int(prompt("Server doesn't have SWAP. Set size in MB to create SWAP. Keep 0 to skip.",
                                default='0', validate=r'\d+'))
         if swap_size:
             swap_fn = '/swapfile'
@@ -83,6 +85,22 @@ def setup_swap():
             append('/etc/sysctl.conf', 'vm.swappiness={}'.format(swappiness_size), use_sudo=True)
             sudo('sysctl -p')
     print_green('INFO: Setup SWAP... OK')
+
+
+def configure_hostname():
+    print_green('INFO: Configure hostname...')
+    chn = sudo('cat /etc/hostname').strip()
+    nhn = prompt('Set hostname', default=chn, validate=r'[\w\.\-]+')
+    ip = prompt('Set host ip', default=socket.gethostbyname(env.host),
+                validate=r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+    sudo('echo "{}" > /etc/hostname'.format(nhn))
+    comment('/etc/hosts', r'127.0.0.1', use_sudo=True)
+    comment('/etc/hosts', r'127.0.1.1', use_sudo=True, backup='')
+    append('/etc/hosts', '\n127.0.0.1\tlocalhost', use_sudo=True)
+    append('/etc/hosts', '127.0.1.1\t{}'.format(nhn.split('.')[0]), use_sudo=True)
+    append('/etc/hosts', '{}\t{}'.format(ip, nhn), use_sudo=True)
+    sudo('/etc/init.d/hostname.sh start')
+    print_green('INFO: Configure hostname... OK')
 
 
 def configure_timezone():
@@ -115,6 +133,8 @@ def add_user(username, skip_confirm=False):
             return
     print_green('INFO: Add system user "{}"...'.format(username))
     sudo('adduser {}'.format(username))
+    from fabdeb.python import configure_virtualenvwrapper_for_user
+    configure_virtualenvwrapper_for_user(username)
     from fabdeb.tools import add_user_to_proftpd
     add_user_to_proftpd(username)
     print_green('INFO: Add system user "{}"... OK'.format(username))
@@ -135,7 +155,7 @@ def install_ntp():
     def read_ntp_servers():
         ntp_server_list = []
         while True:
-            t = prompt('Write NTP-server host. (Set empty string to continue)', default='').strip()
+            t = prompt('Set NTP-server host. (Set empty string to continue)', default='').strip()
             if not t:
                 break
             ntp_server_list.append(t)

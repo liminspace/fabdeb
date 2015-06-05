@@ -2,13 +2,13 @@ from fabric.decorators import task
 from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade
 from fabdeb.db import install_redis, install_postgresql
 from fabdeb.os import (check_sudo, check_os, setup_swap, configure_timezone, OS_REPOSITORIES,
-                       OS_REPOS_INSTALL_KEYS_COMMANDS, install_exim4)
-from fabdeb.python import install_python_pkgs_managers, install_python_venv, configure_virtualenvwrapper_for_user
+                       OS_REPOS_INSTALL_KEYS_COMMANDS, install_exim4, configure_hostname, install_ntp)
+from fabdeb.python import install_python_pkgs_managers, install_python_venv
 from fabdeb.tools import install_pngquant, install_supervisor, reboot, install_proftpd
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 @task
@@ -18,7 +18,8 @@ def prepare_server():
     set_apt_repositories(OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver)
     apt_update()
     apt_upgrade()
-    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core'))
+    configure_hostname()
+    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core', 'pigz'))
     # python common
     apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'))
     # for python pillow
@@ -30,6 +31,7 @@ def prepare_server():
     # for python wand
     apt_install(('libmagickwand-dev',))
     configure_timezone()
+    install_ntp()
     setup_swap()
     install_python_pkgs_managers()
     install_python_venv()

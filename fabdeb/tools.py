@@ -53,7 +53,7 @@ def install_proftpd():
     conf_fn = '/etc/proftpd/proftpd.conf'
     sudo('cp {fn} {fn}.bak'.format(fn=conf_fn), warn_only=True)
     sed(conf_fn, r'UseIPv6\s+on', r'UseIPv6\t\t\t\toff\nUseReverseDNS\t\t\toff', use_sudo=True, backup='')
-    sn = prompt('Write ftp server name', default='MyFTPServer', validate=r'[\w\- ]+')
+    sn = prompt('Set ftp server name', default='MyFTPServer', validate=r'[\w\- ]+')
     sed(conf_fn, r'ServerName\s+".+"', r'ServerName\t\t\t"{}"'.format(sn), use_sudo=True, backup='')
     sed(conf_fn, r'TimeoutNoTransfer.+', r'TimeoutNoTransfer\t\t3600', use_sudo=True, backup='')
     sed(conf_fn, r'TimeoutStalled.+', r'TimeoutStalled\t\t\t3600', use_sudo=True, backup='')
@@ -75,11 +75,8 @@ def install_proftpd():
 def add_user_to_proftpd(username):
     if not confirm('Do you want to setup proftpd for user "{}"?'.format(username)):
         return
-    proftpd_fn = '/usr/sbin/proftpd'
-    if not exists(proftpd_fn):
-        install_proftpd()
-        if not exists(proftpd_fn):
-            return
+    if not exists('/usr/sbin/proftpd'):
+        abort('proftpd is not installed')
     print_green('INFO: Add user "{}" to proftpd...'.format(username))
     from fabdeb.os import user_exists
     if not user_exists(username):

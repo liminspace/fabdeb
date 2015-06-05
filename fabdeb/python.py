@@ -26,6 +26,10 @@ def install_python_venv():
 
 
 def configure_virtualenvwrapper_for_user(username):
+    if not confirm('Do you want to configure virtualenvwrapper to user "{}"?'.format(username)):
+        return
+    if not exists('/usr/local/bin/virtualenvwrapper.sh', use_sudo=True):
+        abort('virtualenvwrapper is not installed.')
     print_green('INFO: Configure virtualenvwrapper to user {}...'.format(username))
     user_dir = '/home/{}'.format(username)
     if not exists(user_dir, use_sudo=True):
