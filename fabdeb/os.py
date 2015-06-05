@@ -100,6 +100,7 @@ def configure_hostname():
     append('/etc/hosts', '127.0.1.1\t{}'.format(nhn.split('.')[0]), use_sudo=True)
     append('/etc/hosts', '{}\t{}'.format(ip, nhn), use_sudo=True)
     sudo('/etc/init.d/hostname.sh start')
+    sudo('hostname {}'.format(nhn))
     print_green('INFO: Configure hostname... OK')
 
 
