@@ -17,11 +17,11 @@ SUPPORT_OS = {
 
 OS_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0',): ('deb http://ftp.us.debian.org/debian jessie main contrib non-free\n'
-                   'deb-src http://ftp.us.debian.org/debian jessie main contrib non-free\n'
+        ('8.0',): ('deb http://http.debian.net/debian jessie main contrib non-free\n'
+                   'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
                    '\n'
-                   'deb http://ftp.debian.org/debian/ jessie-updates main contrib non-free\n'
-                   'deb-src http://ftp.debian.org/debian/ jessie-updates main contrib non-free\n'
+                   'deb http://http.debian.net/debian jessie-updates main contrib non-free\n'
+                   'deb-src http://http.debian.net/debian jessie-updates main contrib non-free\n'
                    '\n'
                    'deb http://security.debian.org/ jessie/updates main contrib non-free\n'
                    'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'),

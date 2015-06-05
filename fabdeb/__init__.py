@@ -8,7 +8,7 @@ from fabdeb.tools import install_pngquant, install_supervisor, reboot, install_p
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 @task
