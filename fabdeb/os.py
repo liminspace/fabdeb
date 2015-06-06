@@ -1,12 +1,13 @@
 import re
 import socket
 from StringIO import StringIO
+from fabric.context_managers import settings
 from fabric.state import env
 from fabdeb.apt import apt_install
 from fabdeb.fab_tools import print_green, print_red, print_yellow
 from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, comment, append
-from fabric.operations import sudo, prompt, get, put
+from fabric.operations import sudo, prompt, get, put, os
 from fabric.utils import abort
 
 
@@ -236,3 +237,69 @@ def install_exim4():
                   ''.format(dkp=dkim_keys_path, dsn=dkim_selector))
         sudo('service exim4 restart', warn_only=True)
     print_green('INFO: Install exim4... OK')
+
+
+def install_user_rsa_key(username):
+    if not user_exists:
+        abort('User {} noes not exist'.format(username))
+    if not confirm('Do you want set SSH key?'):
+        return
+    print_green('INFO: Set SSH key...')
+    print_yellow('Setup SSH key methods:\n'
+                 '1: Generate new ~/.ssh/id_rsa key and manually add public key to remote servers.\n'
+                 '2: Copy exists SSH RSA key from local to ~/.ssh/id_rsa.\n'
+                 '3: Copy exists SSH RSA key from local to ~/.ssh/{keyname}.rsa and configure ~/.ssh/config.')
+    n = prompt('Select method', default='1', validate='[1-3]')
+
+    def file_exists_validator(fn):
+        fn = fn.replace('\\', '/')
+        if not os.path.exists(fn):
+            raise ValueError('File {} does not exist.'.format(fn))
+        return fn
+
+    with settings(sudo_user=username, user=username, group=username):
+        sudo('mkdir ~/.ssh', warn_only=True)
+    if n == '1':
+        with settings(sudo_user=username, user=username, group=username):
+            sudo('ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa')
+            sudo('chmod 600 ~/.ssh/id_rsa', warn_only=True)
+            pub = sudo('cat ~/.ssh/id_rsa.pub', quiet=True)
+            print_red('Add this public key to remote host:\n\n{}\n\n'.format(pub))
+        while not confirm('Did you do it?'):
+            pass
+    elif n == '2':
+        local_key_fn = prompt('Set path to RSA key in local (in windows skip part "C:")',
+                              default='/home/yourusername/.ssh/id_rsa', validate=file_exists_validator)
+        put(local_key_fn, '/home/{}/.ssh/id_rsa'.format(username), use_sudo=True, mode=0600)
+        sudo('chown {u}:{u} /home/{u}/.ssh/id_rsa'.format(u=username))
+    elif n == '3':
+        local_key_fn = prompt('Set path to RSA key in local (in windows skip part "C:")',
+                              default='/home/yourusername/.ssh/id_rsa', validate=file_exists_validator)
+        kn = prompt('Set key name which will be saved as ~/.ssh/{keyname}.rsa', default='key', validate='\w+')
+        put(local_key_fn, '/home/{u}/.ssh/{kn}.rsa'.format(u=username, kn=kn), use_sudo=True, mode=0600)
+        sudo('chown {u}:{u} /home/{u}/.ssh/{kn}.rsa'.format(u=username, kn=kn))
+        h = p = u = None
+        while True:
+            h = prompt('Set hostname for which will be used ~/.ssh/{}.rsa key (without port!)'.format(kn),
+                       default='github.com', validate='.+')
+            p = prompt('Set port for which will be used ~/.ssh/{}.rsa key e.g. "22" (not requirement)'.format(kn),
+                       default='', validate='|\d+')
+            u = prompt('Set user for which will be used ~/.ssh/{}.rsa key e.g. "git" (not requirement)'.format(kn),
+                       validate='|\w+')
+            print_yellow(('HostHame: {h}\n'
+                          'Port: {p}\n'
+                          'User: {u}').format(h=h, p=(p or '-NONE-'), u=(u or '-NONE-')))
+            if confirm('Are you confirm it?'):
+                break
+        cf = '~/.ssh/config'
+        with settings(sudo_user=username, user=username, group=username):
+            append(cf, '\nHost {}'.format(h), use_sudo=True)
+            append(cf, '\tHostName  {}'.format(h), use_sudo=True)
+            append(cf, '\tIdentityFile ~/.ssh/{}.rsa'.format(kn), use_sudo=True)
+            if p:
+                append(cf, '\tPort {}'.format(p), use_sudo=True)
+            if u:
+                append(cf, '\tUser {}'.format(u), use_sudo=True)
+    else:
+        abort('Unknown method')
+    print_green('INFO: Set SSH key... OK')
