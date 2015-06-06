@@ -6,7 +6,7 @@ from fabric.state import env
 from fabdeb.apt import apt_install
 from fabdeb.fab_tools import print_green, print_red, print_yellow
 from fabric.contrib.console import confirm
-from fabric.contrib.files import exists, comment, append
+from fabric.contrib.files import exists, comment, append, uncomment
 from fabric.operations import sudo, prompt, get, put, os
 from fabric.utils import abort
 
@@ -135,6 +135,7 @@ def add_user(username, skip_confirm=False):
             return
     print_green('INFO: Add system user "{}"...'.format(username))
     sudo('adduser {}'.format(username))
+    uncomment('/home/{}/.bashrc'.format(username), r'force_color_prompt=yes', use_sudo=True)
     from fabdeb.python import configure_virtualenvwrapper_for_user
     configure_virtualenvwrapper_for_user(username)
     from fabdeb.tools import add_user_to_proftpd
