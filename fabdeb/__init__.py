@@ -30,6 +30,8 @@ def prepare_server():
     apt_install(('libxml2-dev', 'libxslt-dev'))
     # for python wand
     apt_install(('libmagickwand-dev',))
+    # ImageMagick
+    apt_install(('imagemagick',))
     configure_timezone()
     install_ntp()
     setup_swap()
