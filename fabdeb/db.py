@@ -10,14 +10,14 @@ from fabric.operations import sudo, prompt
 
 POSTGRESQL_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0',): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
+        ('8.0', '8.1'): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
     },
 }
 
 
 POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
     'Debian GNU/Linux 8': {
-        ('8.0',): ('wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',),
+        ('8.0', '8.1'): ('wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',),
     },
 }
 

@@ -6,15 +6,17 @@ from fabric.operations import sudo
 
 NGINX_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0',): ('deb http://nginx.org/packages/debian/ jessie nginx\n'
-                   'deb-src http://nginx.org/packages/debian/ jessie nginx\n'),
+        ('8.0', '8.1'): (
+            'deb http://nginx.org/packages/debian/ jessie nginx\n'
+            'deb-src http://nginx.org/packages/debian/ jessie nginx\n'
+        ),
     },
 }
 
 
 NGINX_REPOS_INSTALL_KEYS_COMMANDS = {
     'Debian GNU/Linux 8': {
-        ('8.0',): (
+        ('8.0', '8.1'): (
             'wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -',
         ),
     },

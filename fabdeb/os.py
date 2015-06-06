@@ -12,20 +12,22 @@ from fabric.utils import abort
 
 
 SUPPORT_OS = {
-    'Debian GNU/Linux 8': ('8.0',)
+    'Debian GNU/Linux 8': ('8.0', '8.1')
 }
 
 
 OS_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0',): ('deb http://http.debian.net/debian jessie main contrib non-free\n'
-                   'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
-                   '\n'
-                   'deb http://http.debian.net/debian jessie-updates main contrib non-free\n'
-                   'deb-src http://http.debian.net/debian jessie-updates main contrib non-free\n'
-                   '\n'
-                   'deb http://security.debian.org/ jessie/updates main contrib non-free\n'
-                   'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'),
+        ('8.0', '8.1'): (
+            'deb http://http.debian.net/debian jessie main contrib non-free\n'
+            'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
+            '\n'
+            'deb http://http.debian.net/debian jessie-updates main contrib non-free\n'
+            'deb-src http://http.debian.net/debian jessie-updates main contrib non-free\n'
+            '\n'
+            'deb http://security.debian.org/ jessie/updates main contrib non-free\n'
+            'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'
+        ),
     },
 }
 
