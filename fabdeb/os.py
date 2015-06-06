@@ -135,7 +135,7 @@ def add_user(username, skip_confirm=False):
             return
     print_green('INFO: Add system user "{}"...'.format(username))
     sudo('adduser {}'.format(username))
-    uncomment('/home/{}/.bashrc'.format(username), r'force_color_prompt=yes', use_sudo=True)
+    uncomment('/home/{}/.bashrc'.format(username), r'#\s*force_color_prompt=yes', use_sudo=True)
     from fabdeb.python import configure_virtualenvwrapper_for_user
     configure_virtualenvwrapper_for_user(username)
     from fabdeb.tools import add_user_to_proftpd

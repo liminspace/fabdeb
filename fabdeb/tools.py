@@ -58,9 +58,9 @@ def install_proftpd():
     sed(conf_fn, r'TimeoutNoTransfer.+', r'TimeoutNoTransfer\t\t3600', use_sudo=True, backup='')
     sed(conf_fn, r'TimeoutStalled.+', r'TimeoutStalled\t\t\t3600', use_sudo=True, backup='')
     sed(conf_fn, r'TimeoutIdle.+', r'TimeoutIdle\t\t\t7200', use_sudo=True, backup='')
-    uncomment(conf_fn, r'DefaultRoot', use_sudo=True, backup='')
-    uncomment(conf_fn, r'RequireValidShell', use_sudo=True, backup='')
-    uncomment(conf_fn, r'PassivePorts', use_sudo=True, backup='')
+    uncomment(conf_fn, r'#\s*DefaultRoot', use_sudo=True, backup='')
+    uncomment(conf_fn, r'#\s*RequireValidShell', use_sudo=True, backup='')
+    uncomment(conf_fn, r'#\s*PassivePorts', use_sudo=True, backup='')
     t = (r'<Global>\n'
          r'    RootLogin off\n'
          r'</Global>\n'
