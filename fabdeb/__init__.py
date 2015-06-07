@@ -19,7 +19,8 @@ def prepare_server():
     apt_update()
     apt_upgrade()
     configure_hostname()
-    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core', 'pigz'))
+    apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core', 'pigz',
+                 'lsb_release'))
     # python common
     apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'))
     # for python pillow

@@ -1,8 +1,7 @@
 import re
-from fabric.network import prompt_for_password
 from fabdeb.apt import set_apt_repositories, apt_update, apt_install
-from fabdeb.fab_tools import print_green, print_red
-from fabric.context_managers import cd, hide
+from fabdeb.fab_tools import print_green
+from fabric.context_managers import cd, hide, settings
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, append
 from fabric.operations import sudo, prompt
@@ -81,24 +80,36 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
                          subconf_name='postgresql')
     apt_update()
     apt_install(('postgresql-{}'.format(ver),))
-    pwd = None
-    while True:
-        pwd = prompt_for_password('Set password to superuser postgres')
-        if not 8 <= len(pwd) <= 40:
-            print_red('Password must be from 8 to 40 symbols. Try again.')
-            continue
-        if not re.findall(r'^[\w\$\^\*\(\)\{\}\[\]\?!@#%&<>:;/+-=]+$', pwd, re.U | re.I):
-            print_red('Password has unallowed symbol. Try again.')
-            continue
-        pwd_confirm = prompt_for_password('Confirm password')
-        if pwd != pwd_confirm:
-            print_red("Passwords aren't matching. Try again.")
-            continue
-        break
-    with hide('running'):
-        sudo('sudo -u postgres psql -c "ALTER USER postgres PASSWORD \'{}\';"'.format(pwd), )
+    from fabdeb.tools import password_prompt
+    set_postgresql_user_password('postgres', password_prompt('Set password to superuser postgres'))
     # listen_addresses = '*' > /etc/postgresql/9.4/main/postgresql.conf
     # host all all 0.0.0.0/0 md5 > /etc/postgresql/9.4/main/pg_hba.conf
     # local all all peer > local all all md5 > /etc/postgresql/9.4/main/pg_hba.conf
     # service postgresql restart
     print_green('INFO: Install PostreSQL {}... OK'.format(ver))
+
+
+def set_postgresql_user_password(username, password):
+    with hide('running'):
+        sudo('sudo -u postgres psql -c "ALTER USER {} PASSWORD \'{}\';"'.format(username, password))
+
+
+def add_user_to_postgresql(username, return_pwd=False):
+    print_green('INFO: Adding user "{}" to PostreSQL...'.format(username))
+    from fabdeb.tools import password_prompt
+    pwd = password_prompt('Set password to new postgresql user "{}"'.format(username))
+    with settings(sudo_user='postgres'):
+        sudo('createuser {}'.format(username))
+    set_postgresql_user_password(username, pwd)
+    print_green('INFO: Adding user "{}" to PostreSQL... OK'.format(username))
+    return pwd if return_pwd else None
+
+
+def add_db_to_postgresql(dbname, owner=None):
+    print_green('INFO: Adding DB "{}" to PostreSQL...'.format(dbname))
+    with settings(sudo_user='postgres'):
+        if owner:
+            sudo('createdb -O {} {}'.format(owner, dbname))
+        else:
+            sudo('createdb {}'.format(dbname))
+    print_green('INFO: Adding DB "{}" to PostreSQL...'.format(dbname))
