@@ -79,7 +79,7 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
     set_apt_repositories(POSTGRESQL_REPOSITORIES, POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver,
                          subconf_name='postgresql')
     apt_update()
-    apt_install(('postgresql-{}'.format(ver),))
+    apt_install(('postgresql-{}'.format(ver), 'postgresql-server-dev-{}'.format(ver), 'libpq-dev'))
     from fabdeb.tools import password_prompt
     set_postgresql_user_password('postgres', password_prompt('Set password to superuser postgres'))
     # listen_addresses = '*' > /etc/postgresql/9.4/main/postgresql.conf

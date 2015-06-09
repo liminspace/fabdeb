@@ -8,7 +8,7 @@ from fabdeb.tools import install_pngquant, install_supervisor, reboot, install_p
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 
 @task
@@ -20,7 +20,7 @@ def prepare_server():
     apt_upgrade()
     configure_hostname()
     apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core', 'pigz',
-                 'lsb_release'))
+                 'lsb_release', 'libcurl4-openssl-dev'))
     # python common
     apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'))
     # for python pillow
