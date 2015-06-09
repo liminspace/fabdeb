@@ -1,6 +1,7 @@
 from StringIO import StringIO
-from fabdeb.fab_tools import print_green
+from fabric.contrib.console import confirm
 from fabric.operations import sudo, put
+from fabdeb.tools import print_green
 
 
 def get_apt_repositories_text(repos, os_issue, os_ver):
@@ -52,9 +53,23 @@ def apt_upgrade():
     print_green('INFO: APT upgrade... OK')
 
 
-def apt_install(pkgs):
-    assert isinstance(pkgs, (list, tuple, set, frozenset))
+def apt_install(pkgs, comment=None, noconfirm=False):
+    assert isinstance(pkgs, (list, tuple, set, frozenset, basestring))
+    if isinstance(pkgs, basestring):
+        pkgs = (pkgs,)
     pkgs_str = ' '.join(pkgs)
+    comment = ' {}'.format(comment) if comment else ''
+    if not noconfirm and not confirm('Do you want to apt install {}?{}'.format(pkgs_str, comment)):
+        return
     print_green('INFO: Apt install {}...'.format(pkgs_str))
     sudo('aptitude install {} -q -y'.format(pkgs_str))
     print_green('INFO: Apt install {}... OK'.format(pkgs_str))
+
+
+def apt_cleanup():
+    if not confirm('Do you want to apt clean up?'):
+        return
+    print_green('INFO: Apt clean up...')
+    sudo('aptitude autoclean -q -y')
+    sudo('aptitude clean -q -y')
+    print_green('INFO: Apt clean up... OK')

@@ -1,8 +1,8 @@
 from fabric.contrib.files import sed
-from fabdeb.apt import apt_install, set_apt_repositories, apt_update
-from fabdeb.fab_tools import print_green
 from fabric.contrib.console import confirm
 from fabric.operations import prompt
+from fabdeb.apt import apt_install, set_apt_repositories, apt_update
+from fabdeb.tools import print_green
 
 
 NGINX_REPOSITORIES = {
@@ -33,7 +33,7 @@ def install_nginx(os_issue, os_ver):
     print_green('INFO: Install nginx...')
     set_apt_repositories(NGINX_REPOSITORIES, NGINX_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver, subconf_name='nginx')
     apt_update()
-    apt_install(('nginx',))
+    apt_install('nginx', noconfirm=True)
     user = prompt('Set user to nginx', default='www-data', validate='[\w\-]+')
     workers = prompt('Set worker_processes', default='1', validate='\d+')
     cmbs = prompt('Set client_max_body_size (MB)', default='32', validate='\d+')

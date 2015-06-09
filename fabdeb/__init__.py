@@ -1,14 +1,18 @@
 from fabric.decorators import task
-from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade
-from fabdeb.db import install_redis, install_postgresql
-from fabdeb.os import (check_sudo, check_os, setup_swap, configure_timezone, OS_REPOSITORIES,
-                       OS_REPOS_INSTALL_KEYS_COMMANDS, install_exim4, configure_hostname, install_ntp)
+from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade, apt_cleanup
+from fabdeb.daemon import install_ntp, install_supervisor
+from fabdeb.ftp import install_proftpd
+from fabdeb.image import install_pngquant
+from fabdeb.mail import install_exim4
+from fabdeb.os import (check_sudo, check_os, OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, configure_hostname,
+                       configure_timezone, setup_swap, server_reboot)
+from fabdeb.postgresql import install_postgresql
 from fabdeb.python import install_python_pkgs_managers, install_python_venv
-from fabdeb.tools import install_pngquant, install_supervisor, reboot, install_proftpd
+from fabdeb.redis import install_redis
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 
 
 @task
@@ -20,19 +24,14 @@ def prepare_server():
     apt_upgrade()
     configure_hostname()
     apt_install(('mc', 'htop', 'tmux', 'gettext', 'curl', 'tcl-dev' 'build-essential', 'git-core', 'pigz',
-                 'lsb_release', 'libcurl4-openssl-dev'))
-    # python common
-    apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'))
-    # for python pillow
+                 'lsb_release', 'libcurl4-openssl-dev'), noconfirm=True)
+    apt_install(('python2.7-dev', 'python-dev', 'libpcre3', 'libpcre3-dev'), comment='For Python')
     apt_install(('tk-dev', 'python-tk', 'python-imaging', 'libjpeg-dev', 'zlib1g-dev',
                  'libtiff-dev', 'libfreetype6-dev', 'liblcms1-dev', 'liblcms2-dev', 'libwebp-dev',
-                 'libopenjpeg-dev', 'openjpeg-tools'))
-    # for python lxml
-    apt_install(('libxml2-dev', 'libxslt-dev'))
-    # for python wand
-    apt_install(('libmagickwand-dev',))
-    # ImageMagick
-    apt_install(('imagemagick',))
+                 'libopenjpeg-dev', 'openjpeg-tools'), comment='For Python Pillow or other image libraries')
+    apt_install(('libxml2-dev', 'libxslt-dev'), comment='For Python lxml')
+    apt_install('libmagickwand-dev', comment='For Python wand')
+    apt_install('imagemagick')
     configure_timezone()
     install_ntp()
     setup_swap()
@@ -45,4 +44,5 @@ def prepare_server():
     install_exim4()
     install_pngquant()
     install_proftpd()
-    reboot()
+    apt_cleanup()
+    server_reboot()

@@ -1,9 +1,9 @@
-from fabdeb.fab_tools import print_green, print_red
 from fabric.context_managers import cd
 from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, append
 from fabric.operations import sudo
 from fabric.utils import abort
+from fabdeb.tools import print_green, print_red
 
 
 # # # COMMANDS # # #
