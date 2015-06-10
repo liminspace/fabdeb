@@ -12,7 +12,7 @@ from fabdeb.redis import install_redis
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.11'
+__version__ = '0.1.12'
 
 
 @task

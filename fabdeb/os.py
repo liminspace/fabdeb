@@ -230,5 +230,5 @@ def update_locale():
     comment('/etc/locale.gen', r'^[^#]', use_sudo=True)
     uncomment('/etc/locale.gen', r'en_US\.UTF\-8', use_sudo=True, backup='')
     sudo('locale-gen')
+    sudo('LANG="en_US.UTF-8"')
     sudo('echo \'LANG="en_US.UTF-8"\' > /etc/default/locale')
-    sudo('. /etc/default/locale')
