@@ -5,7 +5,7 @@ from fabric.contrib.files import sed, uncomment, exists
 from fabric.operations import sudo, prompt, put
 from fabric.utils import abort
 from fabdeb.apt import apt_install
-from fabdeb.os import user_exists
+from fabdeb.os import user_exists, service_restart
 from fabdeb.tools import print_green
 
 
@@ -58,5 +58,5 @@ def add_user_to_proftpd(username):
                  '</Limit>\n').format(user=username)
     put(StringIO(ftpaccess), '/home/{}/.ftpaccess'.format(username), use_sudo=True)
     if confirm('Do you want to restart proftpd?'):
-        sudo('service proftpd restart', warn_only=True)
+        service_restart('proftpd')
     print_green('INFO: Add user "{}" to proftpd... OK'.format(username))

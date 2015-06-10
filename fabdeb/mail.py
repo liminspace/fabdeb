@@ -3,6 +3,7 @@ from StringIO import StringIO
 from fabric.contrib.console import confirm
 from fabric.operations import sudo, prompt, get, put
 from fabdeb.apt import apt_install
+from fabdeb.os import service_restart
 from fabdeb.tools import print_green, print_red
 
 
@@ -65,5 +66,5 @@ def install_exim4():
                   'For test sending mail run:\n'
                   '    # echo testmail | /usr/sbin/sendmail you.real.email@maildomain.com\n'
                   ''.format(dkp=dkim_keys_path, dsn=dkim_selector))
-        sudo('service exim4 restart', warn_only=True)
+        service_restart('exim4')
     print_green('INFO: Install exim4... OK')
