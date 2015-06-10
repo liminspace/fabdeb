@@ -27,6 +27,7 @@ POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
 
 
 def install_postgresql(os_issue, os_ver, ver='9.4'):
+    # simple settings helper http://pgtune.leopard.in.ua/
     assert ver in ('9.4',)
     if not confirm('Do you want to install PostreSQL {}?'.format(ver)):
         return
@@ -76,4 +77,4 @@ def add_db_to_postgresql(dbname, owner=None):
             sudo('createdb -O {} {}'.format(owner, dbname))
         else:
             sudo('createdb {}'.format(dbname))
-    print_green('INFO: Adding DB "{}" to PostreSQL...'.format(dbname))
+    print_green('INFO: Adding DB "{}" to PostreSQL... OK'.format(dbname))

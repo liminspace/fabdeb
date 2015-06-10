@@ -27,7 +27,8 @@ def install_exim4():
               '    Machines to relay mail for: <allow empty>\n'
               '    Keep number of DNS-queries minimal: No\n'
               '    Delivery method for local mail: mbox format\n'
-              '    Split configuration into small files: No\n')
+              '    Split configuration into small files: No\n'
+              '    Root and postmaster mail recipient: <allow empty>\n')
     if confirm('Do you want install opendkim and setup dkim in exim4?'):
         apt_install(('opendkim', 'opendkim-tools'), noconfirm=True)
         sudo('mkdir {}'.format(dkim_keys_path), warn_only=True)
