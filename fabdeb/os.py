@@ -1,6 +1,7 @@
 import re
 import socket
 from fabric.context_managers import settings
+from fabric.network import disconnect_all
 from fabric.state import env
 from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, comment, append, uncomment
@@ -230,5 +231,5 @@ def update_locale():
     comment('/etc/locale.gen', r'^[^#]', use_sudo=True)
     uncomment('/etc/locale.gen', r'en_US\.UTF\-8', use_sudo=True, backup='')
     sudo('locale-gen')
-    sudo('LANG="en_US.UTF-8"')
-    sudo('echo \'LANG="en_US.UTF-8"\' > /etc/default/locale')
+    sudo('echo \'LANG="en_US.UTF-8"\' > /etc/default/locale')  # will be locale warning. it's ok
+    disconnect_all()
