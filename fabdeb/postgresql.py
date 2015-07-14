@@ -33,7 +33,7 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
         return
     print_green('INFO: Install PostreSQL {}...'.format(ver))
     set_apt_repositories(POSTGRESQL_REPOSITORIES, POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver,
-                         subconf_name='postgresql')
+                         subconf_name='postgres')
     apt_update()
     apt_install(('postgresql-{}'.format(ver), 'postgresql-server-dev-{}'.format(ver), 'libpq-dev'), noconfirm=True)
     set_postgresql_user_password('postgres', password_prompt('Set password to superuser postgres'))
@@ -53,6 +53,24 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
     if confirm('Do you want to restart PostgreSQL?'):
         service_restart('postgresql')
     print_green('INFO: Install PostreSQL {}... OK'.format(ver))
+
+
+def install_postgis(postgres_ver='9.4', postgis_ver='2.1'):
+    assert postgres_ver in ('9.4',)
+    assert postgis_ver in ('2.1',)
+    if not confirm('Do you want to install GEOS, GDAL, PROJ.4 and PostGIS?'):
+        return
+    print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}...'.format(postgis_ver,
+                                                                                              postgres_ver))
+    apt_update()
+    apt_install(('libgeos-dev', 'libgeos-c1', 'libgeos++-dev', 'libgeos-3.4.2'), noconfirm=True)
+    apt_install(('gdal-bin', 'python-gdal', 'libgdal-dev', 'libgdal1-dev'), noconfirm=True)
+    apt_install(('libproj-dev', 'libproj0'), noconfirm=True)
+    apt_install(('postgresql-{}-postgis-{}'.format(postgres_ver, postgis_ver), 'postgis'), noconfirm=True)
+    apt_install('libgeoip1', noconfirm=True)
+    apt_install('spatialite-bin', noconfirm=True)
+    print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}... OK'.format(postgis_ver,
+                                                                                                 postgres_ver))
 
 
 def set_postgresql_user_password(username, password):
