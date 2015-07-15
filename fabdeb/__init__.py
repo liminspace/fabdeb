@@ -6,13 +6,13 @@ from fabdeb.image import install_pngquant
 from fabdeb.mail import install_exim4
 from fabdeb.os import (check_sudo, check_os, OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, configure_hostname,
                        configure_timezone, setup_swap, server_reboot, update_locale)
-from fabdeb.postgresql import install_postgresql, install_postgis
+from fabdeb.postgresql import install_postgresql
 from fabdeb.python import install_python_pkgs_managers, install_python_venv
 from fabdeb.redis import install_redis
 from fabdeb.webserver import install_nginx
 
 
-__version__ = '0.1.14'
+__version__ = '0.1.15'
 
 
 @task
@@ -41,7 +41,6 @@ def prepare_server():
     install_nginx(os_issue, os_ver)
     install_redis()
     install_postgresql(os_issue, os_ver)
-    install_postgis()
     install_supervisor()
     install_exim4()
     install_pngquant()

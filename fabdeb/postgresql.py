@@ -50,6 +50,7 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
     sed(hba, r'(local\s+all\s+all\s+)peer', r'\1md5', use_sudo=True)
     if confirm('Do you wand to allow connect to PostgreSQL from out?'):
         append(hba, 'host     all             all             0.0.0.0/0               md5', use_sudo=True)
+    install_postgis(postgres_ver=ver)
     if confirm('Do you want to restart PostgreSQL?'):
         service_restart('postgresql')
     print_green('INFO: Install PostreSQL {}... OK'.format(ver))
@@ -62,7 +63,6 @@ def install_postgis(postgres_ver='9.4', postgis_ver='2.1'):
         return
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}...'.format(postgis_ver,
                                                                                               postgres_ver))
-    apt_update()
     apt_install(('libgeos-dev', 'libgeos-c1', 'libgeos++-dev', 'libgeos-3.4.2'), noconfirm=True)
     apt_install(('gdal-bin', 'python-gdal', 'libgdal-dev', 'libgdal1-dev'), noconfirm=True)
     apt_install(('libproj-dev', 'libproj0'), noconfirm=True)
