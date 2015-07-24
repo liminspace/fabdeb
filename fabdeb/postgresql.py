@@ -96,3 +96,17 @@ def add_db_to_postgresql(dbname, owner=None):
         else:
             sudo('createdb {}'.format(dbname))
     print_green('INFO: Adding DB "{}" to PostreSQL... OK'.format(dbname))
+
+
+def create_postgres_extensions_in_db(dbname, extensions):
+    if isinstance(extensions, basestring):
+        extensions = (extensions,)
+    if not extensions:
+        return
+    for extension in extensions:
+        if extension not in ('postgis',):
+            raise AssertionError
+    print_green('INFO: Create PostgreSQL extensions in DB "{}": {}...'.format(dbname, ', '.join(extensions)))
+    for extension in extensions:
+        sudo('sudo -u postgres psql -d {} -c "CREATE EXTENSION IF NOT EXISTS {};"'.format(dbname, extension))
+    print_green('INFO: Create PostgreSQL extensions in DB "{}": {}... OK'.format(dbname, ', '.join(extensions)))
