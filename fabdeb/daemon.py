@@ -1,14 +1,25 @@
 from fabric.contrib.console import confirm
 from fabric.contrib.files import comment, append
+from fabric.decorators import task
 from fabric.operations import prompt
 from fabdeb.apt import apt_install
+from fabdeb.os import check_sudo, check_os
 from fabdeb.tools import print_green, print_red, print_yellow
+
+
+__all__ = ('install_supervisor', 'install_ntp')
 
 
 # # # COMMANDS # # #
 
 
+@task
 def install_supervisor():
+    """
+    Install supervisor daemon
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install supervisor?'):
         return
     print_green('INFO: Install supervisor...')
@@ -16,11 +27,17 @@ def install_supervisor():
     print_green('INFO: Install supervisor... OK')
 
 
+@task
 def install_ntp():
+    """
+    Install ntp daemon
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want install NTP client?'):
         return
     print_green('INFO: Install ntp...')
-    apt_install(('ntp', 'ntpdate'), noconfirm=True)
+    apt_install('ntp ntpdate', noconfirm=True)
     print_red("Go to http://www.pool.ntp.org/ and select servers in your server's country.\n"
               "For example (Ukraine):\n"
               "    0.ua.pool.ntp.org\n"

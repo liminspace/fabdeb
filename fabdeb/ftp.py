@@ -2,17 +2,27 @@ import re
 from StringIO import StringIO
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, uncomment, exists
+from fabric.decorators import task
 from fabric.operations import sudo, prompt, put
 from fabric.utils import abort
 from fabdeb.apt import apt_install
-from fabdeb.os import user_exists, service_restart
+from fabdeb.os import user_exists, service_restart, check_sudo, check_os
 from fabdeb.tools import print_green
+
+
+__all__ = ('install_proftpd', 'add_user_to_proftpd')
 
 
 # # # COMMANDS # # #
 
 
+@task
 def install_proftpd():
+    """
+    Install proftpd server
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install proftpd?'):
         return
     print_green('INFO: Install proftpd...')
@@ -39,7 +49,13 @@ def install_proftpd():
     print_green('INFO: Install proftpd... OK')
 
 
+@task
 def add_user_to_proftpd(username):
+    """
+    Setup proftpd for user (user's home directory will be available via ftp)
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to setup proftpd for user "{}"?'.format(username)):
         return
     if not exists('/usr/sbin/proftpd'):

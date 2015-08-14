@@ -1,16 +1,26 @@
 import re
 from StringIO import StringIO
 from fabric.contrib.console import confirm
+from fabric.decorators import task
 from fabric.operations import sudo, prompt, get, put
 from fabdeb.apt import apt_install
-from fabdeb.os import service_restart
+from fabdeb.os import service_restart, check_sudo, check_os
 from fabdeb.tools import print_green, print_red
+
+
+__all__ = ('install_exim4',)
 
 
 # # # COMMANDS # # #
 
 
+@task
 def install_exim4():
+    """
+    Install email-server exim4, configure DKIM and generate DKIM-keys
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want install exim4?'):
         return
     print_green('INFO: Install exim4...')
@@ -30,7 +40,7 @@ def install_exim4():
               '    Split configuration into small files: No\n'
               '    Root and postmaster mail recipient: <allow empty>\n')
     if confirm('Do you want install opendkim and setup dkim in exim4?'):
-        apt_install(('opendkim', 'opendkim-tools'), noconfirm=True)
+        apt_install('opendkim opendkim-tools', noconfirm=True)
         sudo('mkdir {}'.format(dkim_keys_path), warn_only=True)
         sudo('chown Debian-exim:Debian-exim {dkp} && chmod 700 {dkp}'.format(dkp=dkim_keys_path))
         dkim_selector = prompt('Set DKIM selector name', default='mail', validate=r'[\w]+')

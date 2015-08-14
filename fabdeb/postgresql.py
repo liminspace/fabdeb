@@ -3,10 +3,15 @@ from StringIO import StringIO
 from fabric.context_managers import hide, settings
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, append
+from fabric.decorators import task
 from fabric.operations import sudo, prompt, get, put
 from fabdeb.apt import set_apt_repositories, apt_update, apt_install
-from fabdeb.os import service_restart
+from fabdeb.os import service_restart, check_sudo, check_os
 from fabdeb.tools import print_green, password_prompt
+
+
+__all__ = ('install_postgresql', 'install_postgis', 'set_postgresql_user_password', 'add_user_to_postgresql',
+           'add_db_to_postgresql', 'create_postgres_extensions_in_db')
 
 
 POSTGRESQL_REPOSITORIES = {
@@ -26,16 +31,21 @@ POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
 # # # COMMANDS # # #
 
 
-def install_postgresql(os_issue, os_ver, ver='9.4'):
+@task
+def install_postgresql(ver='9.4'):
+    """
+    Install PostgreSQL server
+    """
     # simple settings helper http://pgtune.leopard.in.ua/
     assert ver in ('9.4',)
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install PostreSQL {}?'.format(ver)):
         return
     print_green('INFO: Install PostreSQL {}...'.format(ver))
-    set_apt_repositories(POSTGRESQL_REPOSITORIES, POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver,
-                         subconf_name='postgres')
+    set_apt_repositories(POSTGRESQL_REPOSITORIES, POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS, subconf_name='postgres')
     apt_update()
-    apt_install(('postgresql-{}'.format(ver), 'postgresql-server-dev-{}'.format(ver), 'libpq-dev'), noconfirm=True)
+    apt_install('postgresql-{ver} postgresql-server-dev-{ver} libpq-dev'.format(ver=ver), noconfirm=True)
     set_postgresql_user_password('postgres', password_prompt('Set password to superuser postgres'))
     la = prompt('Set listen_addresses (hostname or ip, comma separated; set * for all)', default='localhost',
                 validate='[\w\.\-\*]+').strip()
@@ -56,29 +66,47 @@ def install_postgresql(os_issue, os_ver, ver='9.4'):
     print_green('INFO: Install PostreSQL {}... OK'.format(ver))
 
 
+@task
 def install_postgis(postgres_ver='9.4', postgis_ver='2.1'):
+    """
+    Install PostGIS for PostgreSQL
+    """
     assert postgres_ver in ('9.4',)
     assert postgis_ver in ('2.1',)
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install GEOS, GDAL, PROJ.4 and PostGIS?'):
         return
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}...'.format(postgis_ver,
                                                                                               postgres_ver))
-    apt_install(('libgeos-dev', 'libgeos-c1', 'libgeos++-dev', 'libgeos-3.4.2'), noconfirm=True)
-    apt_install(('gdal-bin', 'python-gdal', 'libgdal-dev', 'libgdal1-dev'), noconfirm=True)
-    apt_install(('libproj-dev', 'libproj0'), noconfirm=True)
-    apt_install(('postgresql-{}-postgis-{}'.format(postgres_ver, postgis_ver), 'postgis'), noconfirm=True)
+    apt_install('libgeos-dev libgeos-c1 libgeos++-dev libgeos-3.4.2', noconfirm=True)
+    apt_install('gdal-bin python-gdal libgdal-dev libgdal1-dev', noconfirm=True)
+    apt_install('libproj-dev libproj0', noconfirm=True)
+    apt_install('postgresql-{}-postgis-{} postgis'.format(postgres_ver, postgis_ver), noconfirm=True)
     apt_install('libgeoip1', noconfirm=True)
     apt_install('spatialite-bin', noconfirm=True)
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}... OK'.format(postgis_ver,
                                                                                                  postgres_ver))
 
 
+@task
 def set_postgresql_user_password(username, password):
+    """
+    Set password to PosgtreSQL-user
+    """
+    check_sudo()
+    check_os()
     with hide('running'):
         sudo('sudo -u postgres psql -c "ALTER USER {} PASSWORD \'{}\';"'.format(username, password))
 
 
+@task
 def add_user_to_postgresql(username, return_pwd=False):
+    """
+    Add new PostgreSQL user
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Adding user "{}" to PostreSQL...'.format(username))
     pwd = password_prompt('Set password to new postgresql user "{}"'.format(username))
     with settings(sudo_user='postgres'):
@@ -88,7 +116,13 @@ def add_user_to_postgresql(username, return_pwd=False):
     return pwd if return_pwd else None
 
 
+@task
 def add_db_to_postgresql(dbname, owner=None):
+    """
+    Create new PostgreSQL database
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Adding DB "{}" to PostreSQL...'.format(dbname))
     with settings(sudo_user='postgres'):
         if owner:
@@ -98,7 +132,13 @@ def add_db_to_postgresql(dbname, owner=None):
     print_green('INFO: Adding DB "{}" to PostreSQL... OK'.format(dbname))
 
 
+@task
 def create_postgres_extensions_in_db(dbname, extensions):
+    """
+    Create PostGIS extension in PostgreSQL database
+    """
+    check_sudo()
+    check_os()
     if isinstance(extensions, basestring):
         extensions = (extensions,)
     if not extensions:

@@ -1,6 +1,7 @@
 import re
 import socket
 from fabric.context_managers import settings
+from fabric.decorators import task
 from fabric.network import disconnect_all
 from fabric.state import env
 from fabric.contrib.console import confirm
@@ -8,6 +9,10 @@ from fabric.contrib.files import exists, comment, append, uncomment
 from fabric.operations import sudo, prompt, put, os, reboot
 from fabric.utils import abort
 from fabdeb.tools import print_green, print_yellow, print_red
+
+
+__all__ = ('check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone', 'add_user', 'install_user_rsa_key',
+           'service_restart', 'server_reboot', 'update_locale')
 
 
 SUPPORT_OS = {
@@ -34,22 +39,20 @@ OS_REPOSITORIES = {
 OS_REPOS_INSTALL_KEYS_COMMANDS = {}
 
 
+def user_exists(username):
+    return exists('/home/{}'.format(username), use_sudo=True)
+
+
 # # # COMMANDS # # #
 
 
-def check_sudo():
-    print_green('INFO: Check sudo...')
-    t = sudo('whoami', quiet=True)
-    if t.failed:
-        print_red('NOTE: For using this fabfile you need to install sudo:\n'
-                  '  # aptitude install sudo\n'
-                  'and add your non-root user to group sudo:\n'
-                  '  # adduser YourNonRootUserName sudo')
-        abort(t)
-    print_green('INFO: Check sudo... OK')
-
-
+@task
 def check_os():
+    """
+    Check OS supported by fabdeb
+    """
+    if '_fd_checked_os_' in env:
+        return env._fd_checked_os_
     print_green('INFO: Check your OS...')
     remote_os_issue = sudo('cat /etc/issue', quiet=True)
     os_issue = os_ver = ok = None
@@ -63,10 +66,36 @@ def check_os():
     if remote_os_ver not in os_ver:
         abort('Your OS "{}" version "{}" is not supported :('.format(remote_os_issue, remote_os_ver))
     print_green('INFO: Check your OS... OK')
-    return os_issue, remote_os_ver
+    env._fd_checked_os_ = os_issue, remote_os_ver
+    return env._fd_checked_os_
 
 
+@task
+def check_sudo():
+    """
+    Check available sudo command
+    """
+    if '_fd_checked_sudo_' in env:
+        return
+    print_green('INFO: Check sudo...')
+    t = sudo('whoami', quiet=True)
+    if t.failed:
+        print_red('NOTE: For using this fabfile you need to install sudo:\n'
+                  '  # aptitude install sudo\n'
+                  'and add your non-root user to group sudo:\n'
+                  '  # adduser YourNonRootUserName sudo')
+        abort(t)
+    print_green('INFO: Check sudo... OK')
+    env._fd_checked_sudo_ = True
+
+
+@task
 def setup_swap():
+    """
+    Setup SWAP and configure swappiness
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Setup SWAP...')
     t = sudo('swapon -s', quiet=True)
     if not re.search(r'\s\d+\s', t):
@@ -89,7 +118,13 @@ def setup_swap():
     print_green('INFO: Setup SWAP... OK')
 
 
+@task
 def configure_hostname():
+    """
+    Configure hostname, host ip, /etc/hosts
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Configure hostname...')
     chn = sudo('cat /etc/hostname').strip()
     nhn = prompt('Set hostname', default=chn, validate=r'[\w\.\-]+')
@@ -106,7 +141,13 @@ def configure_hostname():
     print_green('INFO: Configure hostname... OK')
 
 
+@task
 def configure_timezone():
+    """
+    Configure timezone
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Configure timezone...')
     current_tz = sudo('cat /etc/timezone', quiet=True).strip()
 
@@ -124,11 +165,13 @@ def configure_timezone():
     print_green('INFO: Configure timezone... OK')
 
 
-def user_exists(username):
-    return exists('/home/{}'.format(username), use_sudo=True)
-
-
+@task
 def add_user(username, skip_confirm=False):
+    """
+    Add new system user
+    """
+    check_sudo()
+    check_os()
     if user_exists(username):
         abort('User {} exists'.format(username))
     if not skip_confirm:
@@ -144,7 +187,13 @@ def add_user(username, skip_confirm=False):
     print_green('INFO: Add system user "{}"... OK'.format(username))
 
 
+@task
 def install_user_rsa_key(username):
+    """
+    Install RSA/SSH key for user
+    """
+    check_sudo()
+    check_os()
     if not user_exists:
         abort('User {} noes not exist'.format(username))
     if not confirm('Do you want set SSH key?'):
@@ -210,7 +259,13 @@ def install_user_rsa_key(username):
     print_green('INFO: Set SSH key... OK')
 
 
+@task
 def service_restart(service_name, attempt=5):
+    """
+    service ... stop; service ... start
+    """
+    check_sudo()
+    check_os()
     n = 1
     while True:
         r = sudo('service {s} stop; service {s} start'.format(s=service_name), warn_only=True)
@@ -221,13 +276,25 @@ def service_restart(service_name, attempt=5):
         n += 1
 
 
+@task
 def server_reboot():
+    """
+    Reboot host
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to reboot server?'):
         return
-    reboot()
+    reboot(wait=180)
 
 
+@task
 def update_locale():
+    """
+    Setup en_US.UTF-8 system locale
+    """
+    check_sudo()
+    check_os()
     comment('/etc/locale.gen', r'^[^#]', use_sudo=True)
     uncomment('/etc/locale.gen', r'en_US\.UTF\-8', use_sudo=True, backup='')
     sudo('locale-gen')

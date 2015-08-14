@@ -1,7 +1,7 @@
-__version__ = '0.1.18'
+__version__ = '0.2.0'
 
 
 try:
-    from fabdeb.master_tasks import *
+    from fabdeb.master_tasks import prepare_server
 except ImportError:
     pass

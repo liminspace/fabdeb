@@ -1,15 +1,26 @@
 from fabric.context_managers import cd
 from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, append
+from fabric.decorators import task
 from fabric.operations import sudo
 from fabric.utils import abort
+from fabdeb.os import check_sudo, check_os
 from fabdeb.tools import print_green, print_red
+
+
+__all__ = ('install_python_pkgs_managers', 'install_python_venv', 'configure_virtualenvwrapper_for_user')
 
 
 # # # COMMANDS # # #
 
 
+@task
 def install_python_pkgs_managers():
+    """
+    Install setuptools & pip for python
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Install python setuptools & pip...')
     with cd('/tmp'):
         sudo('wget -q https://bootstrap.pypa.io/ez_setup.py -O - | python')
@@ -18,14 +29,26 @@ def install_python_pkgs_managers():
     print_green('INFO: Install python setuptools & pip... OK')
 
 
+@task
 def install_python_venv():
+    """
+    Install virtualenv & virtualenvwrapper for python
+    """
+    check_sudo()
+    check_os()
     print_green('INFO: Install python virtualenv & virtualenvwrapper...')
     sudo('pip install -q virtualenv')
     sudo('pip install -q virtualenvwrapper')
     print_green('INFO: Install python virtualenv & virtualenvwrapper... OK')
 
 
+@task
 def configure_virtualenvwrapper_for_user(username):
+    """
+    Configure virtualenvwrapper for user
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to configure virtualenvwrapper to user "{}"?'.format(username)):
         return
     if not exists('/usr/local/bin/virtualenvwrapper.sh', use_sudo=True):

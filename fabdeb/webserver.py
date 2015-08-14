@@ -1,8 +1,14 @@
 from fabric.contrib.files import sed
 from fabric.contrib.console import confirm
+from fabric.decorators import task
 from fabric.operations import prompt
 from fabdeb.apt import apt_install, set_apt_repositories, apt_update
+from fabdeb.os import check_sudo
+from fabdeb.os import check_os
 from fabdeb.tools import print_green
+
+
+__all__ = ('install_nginx',)
 
 
 NGINX_REPOSITORIES = {
@@ -27,11 +33,17 @@ NGINX_REPOS_INSTALL_KEYS_COMMANDS = {
 # # # COMMANDS # # #
 
 
-def install_nginx(os_issue, os_ver):
+@task
+def install_nginx():
+    """
+    Install Nginx web-server
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install nginx?'):
         return
     print_green('INFO: Install nginx...')
-    set_apt_repositories(NGINX_REPOSITORIES, NGINX_REPOS_INSTALL_KEYS_COMMANDS, os_issue, os_ver, subconf_name='nginx')
+    set_apt_repositories(NGINX_REPOSITORIES, NGINX_REPOS_INSTALL_KEYS_COMMANDS, subconf_name='nginx')
     apt_update()
     apt_install('nginx', noconfirm=True)
     user = prompt('Set user to nginx', default='www-data', validate='[\w\-]+')

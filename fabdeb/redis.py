@@ -2,8 +2,14 @@ import re
 from fabric.context_managers import cd
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, append
+from fabric.decorators import task
 from fabric.operations import sudo, prompt
+from fabdeb.os import check_sudo
+from fabdeb.os import check_os
 from fabdeb.tools import print_green
+
+
+__all__ = ('install_redis',)
 
 
 def bind_validate(s):
@@ -22,7 +28,13 @@ def bind_validate(s):
 # # # COMMANDS # # #
 
 
+@task
 def install_redis():
+    """
+    Install Redis-server
+    """
+    check_sudo()
+    check_os()
     if not confirm('Do you want to install Redis?'):
         return
     print_green('INFO: Install Redis...')
