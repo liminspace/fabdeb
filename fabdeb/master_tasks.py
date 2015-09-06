@@ -26,7 +26,7 @@ def prepare_server():
     set_apt_repositories(OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS)
     update_locale()
     configure_hostname()
-    for_python = confirm('Do you want to install all thinks for python projects?')
+    for_python = confirm('Do you want to install all things for python projects?')
     apt_update()
     apt_upgrade()
     apt_dist_upgrade()

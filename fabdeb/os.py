@@ -16,7 +16,7 @@ __all__ = ('check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone
 
 
 SUPPORT_OS = {
-    'Debian GNU/Linux 8': ('8.0', '8.1')
+    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2')
 }
 
 
@@ -298,5 +298,8 @@ def update_locale():
     comment('/etc/locale.gen', r'^[^#]', use_sudo=True)
     uncomment('/etc/locale.gen', r'en_US\.UTF\-8', use_sudo=True, backup='')
     sudo('locale-gen')
-    sudo('echo \'LANG="en_US.UTF-8"\' > /etc/default/locale')  # will be locale warning. it's ok
+    sudo('> /etc/default/locale')
+    sudo('echo \'LANGUAGE="en_US.UTF-8"\' > /etc/default/locale')  # will be locale warning. it's ok
+    sudo('echo \'LANG="en_US.UTF-8"\' > /etc/default/locale')
+    sudo('echo \'LC_ALL="en_US.UTF-8"\' > /etc/default/locale')
     disconnect_all()
