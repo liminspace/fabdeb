@@ -22,7 +22,7 @@ SUPPORT_OS = {
 
 OS_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1'): (
+        ('8.0', '8.1', '8.2'): (
             'deb http://http.debian.net/debian jessie main contrib non-free\n'
             'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
             '\n'
