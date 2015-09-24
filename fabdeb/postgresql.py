@@ -144,7 +144,7 @@ def create_postgres_extensions_in_db(dbname, extensions):
     if not extensions:
         return
     for extension in extensions:
-        if extension not in ('postgis',):
+        if extension not in ('postgis', 'hstore'):
             raise AssertionError
     print_green('INFO: Create PostgreSQL extensions in DB "{}": {}...'.format(dbname, ', '.join(extensions)))
     for extension in extensions:
