@@ -16,14 +16,16 @@ __all__ = ('install_postgresql', 'install_postgis', 'set_postgresql_user_passwor
 
 POSTGRESQL_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2'): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
+        ('8.0', '8.1', '8.2', '8.3'): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
     },
 }
 
 
 POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2'): ('wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',),
+        ('8.0', '8.1', '8.2', '8.3'): (
+            'wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',
+        ),
     },
 }
 
@@ -37,7 +39,7 @@ def install_postgresql(ver='9.4'):
     Install PostgreSQL server
     """
     # simple settings helper http://pgtune.leopard.in.ua/
-    assert ver in ('9.4',)
+    assert ver in ('9.4', '9.5')
     check_sudo()
     check_os()
     if not confirm('Do you want to install PostreSQL {}?'.format(ver)):
@@ -67,12 +69,16 @@ def install_postgresql(ver='9.4'):
 
 
 @task
-def install_postgis(postgres_ver='9.4', postgis_ver='2.1'):
+def install_postgis(postgres_ver='9.4', postgis_ver='2.2'):
     """
     Install PostGIS for PostgreSQL
     """
-    assert postgres_ver in ('9.4',)
-    assert postgis_ver in ('2.1',)
+    support_versions = {
+        '9.4': ('2.1', '2.2'),
+        '9.5': ('2.2',),
+    }
+    assert postgres_ver in ('9.4', '9.5')
+    assert postgis_ver in support_versions[postgres_ver]
     check_sudo()
     check_os()
     if not confirm('Do you want to install GEOS, GDAL, PROJ.4 and PostGIS?'):

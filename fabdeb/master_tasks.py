@@ -31,17 +31,18 @@ def prepare_server():
     apt_upgrade()
     apt_dist_upgrade()
     apt_install(
-        'mc htop tmux gettext curl tcl-dev build-essential git pigz lsb-release libcurl4-openssl-dev libffi-dev',
+        'mc htop tmux gettext curl tcl-dev build-essential cmake git pigz libxml2-dev libxslt-dev'
+        'lsb-release libcurl4-openssl-dev libffi-dev ca-certificates libssl-dev',
         noconfirm=True
     )
     apt_install('python2.7-dev python-dev libpcre3 libpcre3-dev', comment='For Python', noconfirm=for_python)
     apt_install(
         'tk-dev python-tk python-imaging libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev '
-        'liblcms1-dev liblcms2-dev libwebp-dev libopenjpeg-dev openjpeg-tools',
+        'libtiff5-dev liblcms1-dev liblcms2-dev libwebp-dev libopenjpeg-dev openjpeg-tools '
+        'tcl8.6-dev tk8.6-dev libturbojpeg-dev libtiff-tools',
         comment='For Python Pillow or other image libraries',
         noconfirm=for_python
     )
-    apt_install('libxml2-dev libxslt-dev', comment='For Python lxml', noconfirm=for_python)
     apt_install('libmagickwand-dev', comment='For Python wand', noconfirm=for_python)
     apt_install('imagemagick', noconfirm=for_python)
     configure_timezone()
