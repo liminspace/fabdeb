@@ -1,7 +1,9 @@
 # coding=utf-8
 from __future__ import absolute_import
+import os
 import sys
 import subprocess
+import shutil
 
 
 COMMANDS_LIST = ('register', 'release')
@@ -16,6 +18,9 @@ def register(*args):
 
 
 def release(*args):
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    shutil.rmtree(os.path.join(root_dir, 'build'), ignore_errors=True)
+    shutil.rmtree(os.path.join(root_dir, 'fabdeb.egg-info'), ignore_errors=True)
     subprocess.call(['python', 'setup.py', 'bdist_wheel', 'upload'])
 
 

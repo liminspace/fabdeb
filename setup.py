@@ -1,4 +1,3 @@
-# coding=utf-8
 import os
 from distutils.core import setup
 from setuptools import find_packages
@@ -14,9 +13,9 @@ setup(
     author='liminspace',
     author_email='liminspace@gmail.com',
     url='https://github.com/liminspace/fabdeb',
-    packages=find_packages(exclude=('tests',)),
+    packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
-    zip_safe=False,  # тому, що вкладаємо статику
+    zip_safe=False,  # because include static
     requires=[
         'fabric',
     ],
