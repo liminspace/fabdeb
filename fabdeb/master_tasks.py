@@ -1,7 +1,7 @@
 from fabric.contrib.console import confirm
 from fabric.decorators import task
 from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade, apt_cleanup, apt_dist_upgrade
-from fabdeb.daemon import install_ntp, install_supervisor
+from fabdeb.daemon import install_ntp, install_supervisor_latest
 from fabdeb.ftp import install_proftpd
 from fabdeb.image import install_pngquant
 from fabdeb.mail import install_exim4
@@ -55,7 +55,7 @@ def prepare_server():
     install_nginx()
     install_redis()
     install_postgresql()
-    install_supervisor()
+    install_supervisor_latest()
     install_exim4()
     install_pngquant()
     install_proftpd()
