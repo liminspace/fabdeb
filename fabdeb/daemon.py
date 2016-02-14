@@ -47,12 +47,12 @@ def install_supervisor_latest():
     put(os.path.join(os.path.dirname(__file__), 'confs', 'supervisord.conf'),
         '/etc/supervisor/supervisord.conf',
         use_sudo=True)
-    put(os.path.join(os.path.dirname(__file__), 'scripts', 'supervisord'),
-        '/etc/init.d/supervisord',
+    put(os.path.join(os.path.dirname(__file__), 'scripts', 'supervisor'),
+        '/etc/init.d/supervisor',
         use_sudo=True)
-    sudo('chmod 775 /etc/init.d/supervisord')
-    sudo('update-rc.d supervisord defaults')
-    sudo('service supervisord start')
+    sudo('chmod 775 /etc/init.d/supervisor')
+    sudo('update-rc.d supervisor defaults')
+    sudo('service supervisor start')
     print_green('INFO: Install supervisor... OK')
 
 
