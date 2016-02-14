@@ -1,5 +1,6 @@
 import re
 import socket
+import time
 from fabric.context_managers import settings
 from fabric.decorators import task
 from fabric.network import disconnect_all
@@ -260,7 +261,7 @@ def install_user_rsa_key(username):
 
 
 @task
-def service_restart(service_name, attempt=5):
+def service_restart(service_name, attempt=20):
     """
     service ... stop; service ... start
     """
@@ -274,6 +275,7 @@ def service_restart(service_name, attempt=5):
         if n >= attempt:
             abort('')
         n += 1
+        time.sleep(1)
 
 
 @task

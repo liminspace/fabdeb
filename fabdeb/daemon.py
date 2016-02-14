@@ -1,13 +1,13 @@
 from fabric.contrib.console import confirm
 from fabric.contrib.files import comment, append
 from fabric.decorators import task
-from fabric.operations import prompt
+from fabric.operations import prompt, sudo, put, os
 from fabdeb.apt import apt_install
 from fabdeb.os import check_sudo, check_os
 from fabdeb.tools import print_green, print_red, print_yellow
 
 
-__all__ = ('install_supervisor', 'install_ntp')
+__all__ = ('install_supervisor', 'install_supervisor_latest', 'install_ntp')
 
 
 # # # COMMANDS # # #
@@ -24,6 +24,27 @@ def install_supervisor():
         return
     print_green('INFO: Install supervisor...')
     apt_install('supervisor', noconfirm=True)
+    print_green('INFO: Install supervisor... OK')
+
+
+@task
+def install_supervisor_latest():
+    """
+    Install supervisor daemon from python repository.
+    """
+    check_sudo()
+    check_os()
+    if not confirm('Do you want to install supervisor?'):
+        return
+    print_green('INFO: Install supervisor...')
+    sudo('pip2.7 install -U supervisor')
+    sudo('mkdir /etc/supervisor')
+    sudo('mkdir /etc/supervisor/conf.d')
+    sudo('mkdir /var/log/supervisor')
+    put(os.path.join(os.path.dirname(__file__), 'confs', 'supervisord.conf'), '/etc/supervisor/supervisord.conf')
+    put(os.path.join(os.path.dirname(__file__), 'scripts', 'supervisord.conf'), '/etc/init.d/supervisord')
+    sudo('chmod 775 /etc/init.d/supervisord')
+    sudo('update-rc.d supervisord defaults')
     print_green('INFO: Install supervisor... OK')
 
 
