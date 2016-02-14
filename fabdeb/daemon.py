@@ -1,5 +1,5 @@
 from fabric.contrib.console import confirm
-from fabric.contrib.files import comment, append
+from fabric.contrib.files import comment, append, exists
 from fabric.decorators import task
 from fabric.operations import prompt, sudo, put, os
 from fabdeb.apt import apt_install
@@ -38,13 +38,21 @@ def install_supervisor_latest():
         return
     print_green('INFO: Install supervisor...')
     sudo('pip2.7 install -U supervisor')
-    sudo('mkdir /etc/supervisor')
-    sudo('mkdir /etc/supervisor/conf.d')
-    sudo('mkdir /var/log/supervisor')
-    put(os.path.join(os.path.dirname(__file__), 'confs', 'supervisord.conf'), '/etc/supervisor/supervisord.conf')
-    put(os.path.join(os.path.dirname(__file__), 'scripts', 'supervisord.conf'), '/etc/init.d/supervisord')
+    if not exists('/etc/supervisor', use_sudo=True):
+        sudo('mkdir /etc/supervisor')
+    if not exists('/etc/supervisor/conf.d', use_sudo=True):
+        sudo('mkdir /etc/supervisor/conf.d')
+    if not exists('/var/log/supervisor', use_sudo=True):
+        sudo('mkdir /var/log/supervisor')
+    put(os.path.join(os.path.dirname(__file__), 'confs', 'supervisord.conf'),
+        '/etc/supervisor/supervisord.conf',
+        use_sudo=True)
+    put(os.path.join(os.path.dirname(__file__), 'scripts', 'supervisord'),
+        '/etc/init.d/supervisord',
+        use_sudo=True)
     sudo('chmod 775 /etc/init.d/supervisord')
     sudo('update-rc.d supervisord defaults')
+    sudo('service supervisord start')
     print_green('INFO: Install supervisor... OK')
 
 
