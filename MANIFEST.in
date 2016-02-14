@@ -1,1 +1,3 @@
 include README.md
+recursive-include fabdeb/confs *
+recursive-include fabdeb/scripts *
