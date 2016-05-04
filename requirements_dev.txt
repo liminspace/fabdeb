@@ -5,5 +5,5 @@ pip
 setuptools
 
 pycrypto==2.6.1
-paramiko==1.15.1
-fabric==1.10.2
+paramiko==1.17.0
+fabric==1.11.1
