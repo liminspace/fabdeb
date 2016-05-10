@@ -34,20 +34,31 @@ POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
 }
 
 
+SUPPORT_POSTGRESQL_VERSIONS = ('9.4', '9.5')
+SUPPORT_POSTGIS_VERSIONS = {  # by PostgreSQL version
+    '9.4': ('2.1', '2.2'),
+    '9.5': ('2.2',),
+}
+
+
 # # # COMMANDS # # #
 
 
 @task
-def install_postgresql(ver='9.4'):
+def install_postgresql(ver=None):
     """
     Install PostgreSQL server
     """
     # simple settings helper http://pgtune.leopard.in.ua/
-    assert ver in ('9.4', '9.5')
+    assert ver in SUPPORT_POSTGRESQL_VERSIONS or ver is None
     check_sudo()
     check_os()
-    if not confirm('Do you want to install PostreSQL {}?'.format(ver)):
+    if not confirm('Do you want to install PostreSQL{}?'.format(' {}'.format(ver) if ver else '')):
         return
+    allow_versions = ', '.join(SUPPORT_POSTGRESQL_VERSIONS)
+    while ver not in SUPPORT_POSTGRESQL_VERSIONS:
+        ver = prompt('Write PostgreSQL version you need ({}):'.format(allow_versions),
+                     default=SUPPORT_POSTGRESQL_VERSIONS[-1])
     print_green('INFO: Install PostreSQL {}...'.format(ver))
     set_apt_repositories(POSTGRESQL_REPOSITORIES, POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS, subconf_name='postgres')
     apt_update()
@@ -73,20 +84,26 @@ def install_postgresql(ver='9.4'):
 
 
 @task
-def install_postgis(postgres_ver='9.4', postgis_ver='2.2'):
+def install_postgis(postgres_ver=None, postgis_ver=None):
     """
     Install PostGIS for PostgreSQL
     """
-    support_versions = {
-        '9.4': ('2.1', '2.2'),
-        '9.5': ('2.2',),
-    }
-    assert postgres_ver in ('9.4', '9.5')
-    assert postgis_ver in support_versions[postgres_ver]
+    assert postgres_ver in SUPPORT_POSTGRESQL_VERSIONS or postgres_ver is None
+    assert postgis_ver in ('2.1', '2.2') or postgis_ver is None
+    if postgres_ver and postgis_ver and postgis_ver not in SUPPORT_POSTGIS_VERSIONS[postgres_ver]:
+        AssertionError('Invalid postgis_ver {} for postgres_ver {}'.format(postgres_ver, postgis_ver))
     check_sudo()
     check_os()
     if not confirm('Do you want to install GEOS, GDAL, PROJ.4 and PostGIS?'):
         return
+    allow_versions = ', '.join(SUPPORT_POSTGRESQL_VERSIONS)
+    while postgres_ver not in SUPPORT_POSTGRESQL_VERSIONS:
+        postgres_ver = prompt('Write PostgreSQL version you have ({}):'.format(allow_versions),
+                              default=SUPPORT_POSTGRESQL_VERSIONS[-1])
+    allow_versions = ', '.join(SUPPORT_POSTGIS_VERSIONS[postgres_ver])
+    while postgis_ver not in SUPPORT_POSTGIS_VERSIONS[postgres_ver]:
+        postgis_ver = prompt('Write PostGIS version you need ({}):'.format(allow_versions),
+                             default=SUPPORT_POSTGIS_VERSIONS[postgres_ver][-1])
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}...'.format(postgis_ver,
                                                                                               postgres_ver))
     apt_install('libgeos-dev libgeos-c1 libgeos++-dev libgeos-3.4.2', noconfirm=True)

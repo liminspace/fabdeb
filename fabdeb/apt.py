@@ -58,7 +58,7 @@ def apt_update():
     check_sudo()
     check_os()
     print_green('INFO: Apt update...')
-    sudo('aptitude update -q -y')
+    sudo('aptitude update -q')
     print_green('INFO: Apt update... OK')
 
 
@@ -70,7 +70,8 @@ def apt_upgrade():
     check_sudo()
     check_os()
     print_green('INFO: APT upgrade...')
-    sudo('aptitude upgrade -q -y')
+    opts = '-q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
+    sudo('aptitude upgrade {}'.format(opts))
     print_green('INFO: APT upgrade... OK')
 
 
@@ -82,7 +83,8 @@ def apt_dist_upgrade():
     check_sudo()
     check_os()
     print_green('INFO: APT dist upgrade...')
-    sudo('aptitude dist-upgrade -q -y')
+    opts = '-q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
+    sudo('aptitude dist-upgrade {}'.format(opts))
     print_green('INFO: APT dist upgrade... OK')
 
 
@@ -99,7 +101,8 @@ def apt_install(pkgs, comment=None, noconfirm=False):
     if not noconfirm and not confirm('Do you want to apt install {}?{}'.format(pkgs, comment)):
         return
     print_green('INFO: Apt install {}...'.format(pkgs))
-    sudo('aptitude install {} -q -y'.format(pkgs))
+    opts = '-q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
+    sudo('aptitude install {} {}'.format(opts, pkgs))
     print_green('INFO: Apt install {}... OK'.format(pkgs))
 
 
