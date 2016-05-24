@@ -23,7 +23,7 @@ def install_python_pkgs_managers():
     check_os()
     print_green('INFO: Install python setuptools & pip...')
     with cd('/tmp'):
-        sudo('wget -q https://bootstrap.pypa.io/ez_setup.py -O - | python')
+        sudo('wget -q https://bootstrap.pypa.io/ez_setup.py -O - | python')  # there is problem. maybe aptitude install python-setuptools is better way
         sudo('rm setuptools-*.zip')
         sudo('easy_install -q pip')
     print_green('INFO: Install python setuptools & pip... OK')

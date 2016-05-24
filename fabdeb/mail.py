@@ -64,7 +64,7 @@ def install_exim4():
         ))
         put(t, '/etc/exim4/exim4.conf.template', use_sudo=True)
         sudo('chown root:root {cfn} && chmod 644 {cfn}'.format(cfn='/etc/exim4/exim4.conf.template'))
-        print_red('You need to have DKIM keys.:\n'
+        print_red('You need to have DKIM keys.\n'
                   'You can generate their:\n'
                   '    # opendkim-genkey -D {dkp} -d your-real-domain.com -s {dsn}\n'
                   '    # mv {dkp}/{dsn}.private {dkp}/your-real-domain.com.key\n'

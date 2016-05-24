@@ -3,7 +3,7 @@ from fabric.decorators import task
 from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade, apt_cleanup, apt_dist_upgrade
 from fabdeb.daemon import install_ntp, install_supervisor_latest
 from fabdeb.ftp import install_proftpd
-from fabdeb.image import install_pngquant
+from fabdeb.image import install_pngquant_jpegtran
 from fabdeb.mail import install_exim4
 from fabdeb.os import (OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, configure_hostname,
                        configure_timezone, setup_swap, server_reboot, update_locale, check_sudo, check_os)
@@ -31,7 +31,7 @@ def prepare_server():
     apt_upgrade()
     apt_dist_upgrade()
     apt_install(
-        'mc htop tmux gettext curl tcl-dev build-essential cmake git pigz libxml2-dev libxslt-dev'
+        'mc htop tmux pv gettext curl tcl-dev build-essential cmake git pigz libxml2-dev libxslt-dev '
         'lsb-release libcurl4-openssl-dev libffi-dev ca-certificates libssl-dev',
         noconfirm=True
     )
@@ -57,7 +57,7 @@ def prepare_server():
     install_postgresql()
     install_supervisor_latest()
     install_exim4()
-    install_pngquant()
+    install_pngquant_jpegtran()
     install_proftpd()
     apt_cleanup()
     server_reboot()

@@ -8,23 +8,23 @@ from fabdeb.os import check_os
 from fabdeb.tools import print_green
 
 
-__all__ = ('install_pngquant',)
+__all__ = ('install_pngquant_jpegtran',)
 
 
 # # # COMMANDS # # #
 
 
 @task
-def install_pngquant():
+def install_pngquant_jpegtran():
     """
-    Install pngquant -- console utility for compress PNG-images
+    Install pngquant and jpegtran -- console utility for compress PNG- and JPEG-images
     """
     check_sudo()
     check_os()
-    if not confirm('Do you want to install pngquant?'):
+    if not confirm('Do you want to install pngquant and jpegtran?'):
         return
-    print_green('INFO: Install pngquant...')
-    apt_install('libpng-dev liblcms2-dev', noconfirm=True)
+    print_green('INFO: Install pngquant and jpegtran...')
+    apt_install('libpng-dev liblcms2-dev libjpeg-progs', noconfirm=True)
     with cd('/tmp'):
         sudo('wget -q https://github.com/pornel/pngquant/archive/master.zip')
         sudo('unzip master.zip')
@@ -36,4 +36,4 @@ def install_pngquant():
             sudo('ln -s /usr/local/bin/pngquant /bin/pngquant')
     with cd('/tmp'):
         sudo('rm -rf pngquant-master')
-    print_green('INFO: Install pngquant...  OK')
+    print_green('INFO: Install pngquant and jpegtran...  OK')
