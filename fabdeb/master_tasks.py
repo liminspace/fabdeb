@@ -5,6 +5,7 @@ from fabdeb.daemon import install_ntp, install_supervisor_latest
 from fabdeb.ftp import install_proftpd
 from fabdeb.image import install_pngquant_jpegtran
 from fabdeb.mail import install_exim4
+from fabdeb.node import install_nodejs
 from fabdeb.os import (OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS, configure_hostname,
                        configure_timezone, setup_swap, server_reboot, update_locale, check_sudo, check_os)
 from fabdeb.postgresql import install_postgresql
@@ -52,6 +53,7 @@ def prepare_server():
         install_python_pkgs_managers()
     if for_python or confirm('Do you want to install python virtualenv & virtualenvwrapper?'):
         install_python_venv()
+    install_nodejs()
     install_nginx()
     install_redis()
     install_postgresql()
