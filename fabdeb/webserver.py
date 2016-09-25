@@ -13,7 +13,7 @@ __all__ = ('install_nginx',)
 
 NGINX_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5'): (
+        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6'): (
             'deb http://nginx.org/packages/debian/ jessie nginx\n'
             'deb-src http://nginx.org/packages/debian/ jessie nginx\n'
         ),
@@ -23,7 +23,7 @@ NGINX_REPOSITORIES = {
 
 NGINX_REPOS_INSTALL_KEYS_COMMANDS = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5'): (
+        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6'): (
             'wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -',
         ),
     },
