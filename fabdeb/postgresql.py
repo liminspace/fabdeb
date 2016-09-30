@@ -34,10 +34,11 @@ POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
 }
 
 
-SUPPORT_POSTGRESQL_VERSIONS = ('9.4', '9.5')
+SUPPORT_POSTGRESQL_VERSIONS = ('9.4', '9.5', '9.6')
 SUPPORT_POSTGIS_VERSIONS = {  # by PostgreSQL version
     '9.4': ('2.1', '2.2'),
-    '9.5': ('2.2',),
+    '9.5': ('2.2', '2.3'),
+    '9.6': ('2.3',),
 }
 
 
@@ -109,7 +110,8 @@ def install_postgis(postgres_ver=None, postgis_ver=None):
     apt_install('libgeos-dev libgeos-c1 libgeos++-dev libgeos-3.4.2', noconfirm=True)
     apt_install('gdal-bin python-gdal libgdal-dev libgdal1-dev', noconfirm=True)
     apt_install('libproj-dev libproj0', noconfirm=True)
-    apt_install('postgresql-{}-postgis-{} postgis'.format(postgres_ver, postgis_ver), noconfirm=True)
+    # skip postgis because it install postgresql-9.6 and postgresql-9.6-postgis-2.3
+    apt_install('postgresql-{}-postgis-{}'.format(postgres_ver, postgis_ver), noconfirm=True)
     apt_install('libgeoip1', noconfirm=True)
     apt_install('spatialite-bin', noconfirm=True)
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}... OK'.format(postgis_ver,

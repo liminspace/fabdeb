@@ -33,7 +33,7 @@ def prepare_server():
     apt_dist_upgrade()
     apt_install(
         'mc htop tmux pv gettext curl tcl-dev build-essential cmake git pigz libxml2-dev libxslt-dev '
-        'lsb-release libcurl4-openssl-dev libffi-dev ca-certificates libssl-dev',
+        'lsb-release libcurl4-openssl-dev libffi-dev ca-certificates libssl-dev sysstat',
         noconfirm=True
     )
     apt_install('python2.7-dev python-dev libpcre3 libpcre3-dev', comment='For Python', noconfirm=for_python)
