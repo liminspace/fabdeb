@@ -6,7 +6,7 @@ from fabric.decorators import task
 from fabric.operations import sudo, prompt
 from fabdeb.os import check_sudo
 from fabdeb.os import check_os
-from fabdeb.tools import print_green
+from fabdeb.tools import print_green, print_yellow
 
 
 __all__ = ('install_redis',)
@@ -33,6 +33,10 @@ def install_redis():
     """
     Install Redis-server
     """
+    def _clean():
+        with cd('/tmp'):
+            sudo('rm -rf redis-stable', warn_only=True)
+
     check_sudo()
     check_os()
     if not confirm('Do you want to install Redis?'):
@@ -44,7 +48,12 @@ def install_redis():
         sudo('rm redis-stable.tar.gz')
     with cd('/tmp/redis-stable'):
         sudo('make')
-        sudo('make test')
+        if confirm('Do you want run tests?'):
+            sudo('make test', warn_only=True)
+            if not confirm('Do you want continue install Redis?'):
+                _clean()
+                print_yellow('INFO: Install Redis... CANCELLED')
+                return
         sudo('make install')
         conf_fn = None
         while True:
@@ -61,8 +70,7 @@ def install_redis():
         dbs = prompt('Set dadabases count', default='20', validate='\d+')
         sed(conf_fn, r'(# bind 127.0.0.1)', r'\1\nbind {}'.format(bind), use_sudo=True)
         sed(conf_fn, r'(databases [0-9]+)', r'# \1\ndatabases {}'.format(dbs), use_sudo=True)
-    with cd('/tmp'):
-        sudo('rm -rf redis-stable')
-        if confirm('Do you want to set parameter vm.overcommit_memory=1 to /etc/sysctl.conf? (Recommended)'):
-            append('/etc/sysctl.conf', 'vm.overcommit_memory=1', use_sudo=True)
+    _clean()
+    if confirm('Do you want to set parameter vm.overcommit_memory=1 to /etc/sysctl.conf? (Recommended)'):
+        append('/etc/sysctl.conf', 'vm.overcommit_memory=1', use_sudo=True)
     print_green('INFO: Install Redis... OK')
