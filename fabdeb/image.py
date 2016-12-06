@@ -31,7 +31,7 @@ def install_pngquant_jpegtran():
         sudo('./configure --with-lcms2 && make')
         sudo('make install')
         if confirm('Do you want make symlink /usr/local/bin/pngquant to /bin/pngquant?'):
-            sudo('ln -s /usr/local/bin/pngquant /bin/pngquant')
+            sudo('ln -sf /usr/local/bin/pngquant /bin/pngquant')
     with cd('/tmp'):
         sudo('rm -rf pngquant')
     print_green('INFO: Install pngquant and jpegtran...  OK')
