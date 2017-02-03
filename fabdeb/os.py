@@ -17,13 +17,13 @@ __all__ = ('check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone
 
 
 SUPPORT_OS = {
-    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6')
+    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7')
 }
 
 
 OS_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6'): (
+        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7'): (
             'deb http://http.debian.net/debian jessie main contrib non-free\n'
             'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
             '\n'
