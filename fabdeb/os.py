@@ -167,10 +167,11 @@ def configure_timezone():
 
 
 @task
-def add_user(username, skip_confirm=False):
+def add_user(username, py_ver='2', skip_confirm=False):
     """
     Add new system user
     """
+    assert py_ver in ('2', '3')
     check_sudo()
     check_os()
     if user_exists(username):
@@ -182,7 +183,7 @@ def add_user(username, skip_confirm=False):
     sudo('adduser {}'.format(username))
     uncomment('/home/{}/.bashrc'.format(username), r'#\s*force_color_prompt=yes', use_sudo=True)
     from fabdeb.python import configure_virtualenvwrapper_for_user
-    configure_virtualenvwrapper_for_user(username)
+    configure_virtualenvwrapper_for_user(username, python_ver=py_ver)
     from fabdeb.ftp import add_user_to_proftpd
     add_user_to_proftpd(username)
     print_green('INFO: Add system user "{}"... OK'.format(username))

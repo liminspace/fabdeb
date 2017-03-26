@@ -76,7 +76,7 @@ def install_postgresql(ver=None):
     sudo('chmod 644 {}'.format(postgresql_conf))
     hba = '/etc/postgresql/{}/main/pg_hba.conf'.format(ver)
     sed(hba, r'(local\s+all\s+all\s+)peer', r'\1md5', use_sudo=True)
-    if confirm('Do you wand to allow connect to PostgreSQL from out?'):
+    if confirm('Do you want to allow connect to PostgreSQL from out?'):
         append(hba, 'host     all             all             0.0.0.0/0               md5', use_sudo=True)
     install_postgis(postgres_ver=ver)
     if confirm('Do you want to restart PostgreSQL?'):

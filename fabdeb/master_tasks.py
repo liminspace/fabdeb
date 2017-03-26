@@ -1,5 +1,6 @@
 from fabric.contrib.console import confirm
 from fabric.decorators import task
+from fabric.operations import prompt
 from fabdeb.apt import apt_install, set_apt_repositories, apt_update, apt_upgrade, apt_cleanup, apt_dist_upgrade
 from fabdeb.daemon import install_ntp, install_supervisor_latest
 from fabdeb.ftp import install_proftpd
@@ -28,6 +29,7 @@ def prepare_server():
     update_locale()
     configure_hostname()
     for_python = confirm('Do you want to install all things for python projects?')
+    install_python3 = confirm('Do you want to install Python3?')
     apt_update()
     apt_upgrade()
     apt_dist_upgrade()
@@ -37,6 +39,8 @@ def prepare_server():
         noconfirm=True
     )
     apt_install('python2.7-dev python-dev libpcre3 libpcre3-dev', comment='For Python', noconfirm=for_python)
+    if install_python3:
+        apt_install('python3 python3-dev', comment='For Python3', noconfirm=for_python)
     apt_install(
         'tk-dev python-tk python-imaging libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev '
         'libtiff5-dev liblcms1-dev liblcms2-dev libwebp-dev libopenjpeg-dev openjpeg-tools '
@@ -44,6 +48,12 @@ def prepare_server():
         comment='For Python Pillow or other image libraries',
         noconfirm=for_python
     )
+    if install_python3:
+        apt_install(
+            'python3-tk',
+            comment='For Python3 Pillow or other image libraries',
+            noconfirm=for_python
+        )
     apt_install('libmagickwand-dev', comment='For Python wand', noconfirm=for_python)
     apt_install('imagemagick', noconfirm=for_python)
     configure_timezone()
@@ -51,8 +61,16 @@ def prepare_server():
     setup_swap()
     if for_python or confirm('Do you want to install python setuptools & pip?'):
         install_python_pkgs_managers()
+        if install_python3:
+            install_python_pkgs_managers(python_ver='3')
     if for_python or confirm('Do you want to install python virtualenv & virtualenvwrapper?'):
-        install_python_venv()
+        if install_python3:
+            ver = ''
+            while ver not in ('2', '3'):
+                ver = prompt('Which Python version do you want to use? (2, 3):', default='2')
+        else:
+            ver = '2'
+        install_python_venv(python_ver=ver)
     install_nodejs()
     install_nginx()
     install_redis()
