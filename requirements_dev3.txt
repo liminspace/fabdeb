@@ -3,6 +3,5 @@ setuptools
 wheel
 twine
 
-pycrypto==2.6.1
 paramiko==2.1.2
-fabric==1.13.1
+fabric3==1.13.1.post1

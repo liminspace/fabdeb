@@ -162,7 +162,7 @@ def configure_timezone():
 
     new_timezone = prompt('Set timezone', default=current_tz, validate=validate_tz)
     if current_tz != new_timezone:
-        sudo('echo "{}" > /etc/timezone'.format(new_timezone))
+        sudo('timedatectl set-timezone {}'.format(new_timezone))
     print_green('INFO: Configure timezone... OK')
 
 
@@ -226,13 +226,13 @@ def install_user_rsa_key(username):
     elif n == '2':
         local_key_fn = prompt('Set path to RSA key in local (in windows skip part "C:")',
                               default='/home/yourusername/.ssh/id_rsa', validate=file_exists_validator)
-        put(local_key_fn, '/home/{}/.ssh/id_rsa'.format(username), use_sudo=True, mode=0600)
+        put(local_key_fn, '/home/{}/.ssh/id_rsa'.format(username), use_sudo=True, mode=0o600)
         sudo('chown {u}:{u} /home/{u}/.ssh/id_rsa'.format(u=username))
     elif n == '3':
         local_key_fn = prompt('Set path to RSA key in local (in windows skip part "C:")',
                               default='/home/yourusername/.ssh/id_rsa', validate=file_exists_validator)
         kn = prompt('Set key name which will be saved as ~/.ssh/{keyname}.rsa', default='key', validate='\w+')
-        put(local_key_fn, '/home/{u}/.ssh/{kn}.rsa'.format(u=username, kn=kn), use_sudo=True, mode=0600)
+        put(local_key_fn, '/home/{u}/.ssh/{kn}.rsa'.format(u=username, kn=kn), use_sudo=True, mode=0o600)
         sudo('chown {u}:{u} /home/{u}/.ssh/{kn}.rsa'.format(u=username, kn=kn))
         h = p = u = None
         while True:

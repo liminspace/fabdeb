@@ -37,11 +37,11 @@ def set_apt_repositories(repos, repos_install_keys_commands, subconf_name=None):
     if subconf_name:
         put(repositories_f,
             '/etc/apt/sources.list.d/{}.list'.format(subconf_name.strip()),
-            mode=0644, use_sudo=True)
+            mode=0o644, use_sudo=True)
     else:
         sudo('mv /etc/apt/sources.list /etc/apt/sources.list.bak', warn_only=True)
         put(repositories_f, '/etc/apt/sources.list',
-            mode=0644, use_sudo=True)
+            mode=0o644, use_sudo=True)
     for command in get_apt_repo_install_keys_commands(repos_install_keys_commands):
         sudo(command)
     print_green('INFO: Set apt repositories... OK')
