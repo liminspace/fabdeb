@@ -29,7 +29,6 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Tools',
         'License :: OSI Approved :: MIT License',
     ],
 )
