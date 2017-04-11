@@ -168,7 +168,7 @@ def create_postgres_extensions_in_db(dbname, extensions):
     """
     check_sudo()
     check_os()
-    if isinstance(extensions, basestring):
+    if isinstance(extensions, str):
         extensions = (extensions,)
     if not extensions:
         return

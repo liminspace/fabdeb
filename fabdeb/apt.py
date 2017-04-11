@@ -95,7 +95,7 @@ def apt_install(pkgs, comment=None, noconfirm=False):
     """
     check_sudo()
     check_os()
-    assert isinstance(pkgs, basestring)
+    assert isinstance(pkgs, str)
     pkgs = ' '.join(pkgs.split())
     comment = ' {}'.format(comment) if comment else ''
     if not noconfirm and not confirm('Do you want to apt install {}?{}'.format(pkgs, comment)):
