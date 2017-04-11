@@ -1,5 +1,5 @@
 import re
-from StringIO import StringIO
+from io import StringIO
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, uncomment, exists
 from fabric.decorators import task

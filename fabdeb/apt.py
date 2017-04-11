@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 from fabric.contrib.console import confirm
 from fabric.decorators import task
 from fabric.operations import sudo, put

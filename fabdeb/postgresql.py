@@ -1,5 +1,5 @@
 import re
-from StringIO import StringIO
+from io import StringIO
 from fabric.context_managers import hide, settings
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, append
