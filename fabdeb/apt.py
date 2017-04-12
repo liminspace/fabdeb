@@ -13,7 +13,7 @@ def get_apt_repositories_text(repos):
     os_issue, os_ver = check_os()
     t = repos.get(os_issue)
     if t:
-        for versions, text in t.iteritems():
+        for versions, text in t.items():
             if os_ver in versions:
                 return text
     raise RuntimeError('Does not exists apt repositories for "{}" version "{}"'.format(os_issue, os_ver))
@@ -23,7 +23,7 @@ def get_apt_repo_install_keys_commands(repos_install_keys_commands):
     os_issue, os_ver = check_os()
     t = repos_install_keys_commands.get(os_issue)
     if t:
-        for versions, commands in t.iteritems():
+        for versions, commands in t.items():
             if os_ver in versions:
                 return commands
     return ()

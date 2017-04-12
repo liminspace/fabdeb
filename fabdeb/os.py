@@ -57,7 +57,7 @@ def check_os():
     print_green('INFO: Check your OS...')
     remote_os_issue = sudo('cat /etc/issue', quiet=True)
     os_issue = os_ver = ok = None
-    for os_issue, os_ver in SUPPORT_OS.iteritems():
+    for os_issue, os_ver in SUPPORT_OS.items():
         if os_issue in remote_os_issue:
             ok = True
             break
