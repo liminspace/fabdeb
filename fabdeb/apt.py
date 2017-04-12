@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 from fabric.contrib.console import confirm
 from fabric.decorators import task
 from fabric.operations import sudo, put
@@ -33,7 +33,7 @@ def set_apt_repositories(repos, repos_install_keys_commands, subconf_name=None):
     check_sudo()
     check_os()
     print_green('INFO: Set apt repositories...')
-    repositories_f = StringIO(get_apt_repositories_text(repos))
+    repositories_f = BytesIO(get_apt_repositories_text(repos).encode())
     if subconf_name:
         put(repositories_f,
             '/etc/apt/sources.list.d/{}.list'.format(subconf_name.strip()),

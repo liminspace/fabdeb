@@ -1,5 +1,5 @@
 import re
-from io import StringIO
+from io import BytesIO
 from fabric.context_managers import hide, settings
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, append
@@ -67,10 +67,12 @@ def install_postgresql(ver=None):
     set_postgresql_user_password('postgres', password_prompt('Set password to superuser postgres'))
     la = prompt('Set listen_addresses (hostname or ip, comma separated; set * for all)', default='localhost',
                 validate='[\w\.\-\*]+').strip()
-    t = StringIO()
+    t = BytesIO()
     postgresql_conf = '/etc/postgresql/{}/main/postgresql.conf'.format(ver)
     get(postgresql_conf, local_path=t, use_sudo=True)
-    t = StringIO(re.sub(r"#listen_addresses = 'localhost'", r"listen_addresses = '{}'".format(la), t.getvalue()))
+    t = BytesIO(
+        re.sub(br"#listen_addresses = 'localhost'", r"listen_addresses = '{}'".format(la).encode(), t.getvalue())
+    )
     put(t, postgresql_conf, use_sudo=True)
     sudo('chown postgres:postgres {}'.format(postgresql_conf))
     sudo('chmod 644 {}'.format(postgresql_conf))

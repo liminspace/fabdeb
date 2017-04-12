@@ -1,5 +1,5 @@
 import re
-from io import StringIO
+from io import BytesIO
 from fabric.contrib.console import confirm
 from fabric.contrib.files import sed, uncomment, exists
 from fabric.decorators import task
@@ -71,8 +71,8 @@ def add_user_to_proftpd(username):
     ftpaccess = ('<Limit READ WRITE DIRS>\n'
                  '    Order deny,allow\n'
                  '    Allowuser {user}\n'
-                 '</Limit>\n').format(user=username)
-    put(StringIO(ftpaccess), '/home/{}/.ftpaccess'.format(username), use_sudo=True)
+                 '</Limit>\n').format(user=username).encode()
+    put(BytesIO(ftpaccess), '/home/{}/.ftpaccess'.format(username), use_sudo=True)
     if confirm('Do you want to restart proftpd?'):
         service_restart('proftpd')
     print_green('INFO: Add user "{}" to proftpd... OK'.format(username))

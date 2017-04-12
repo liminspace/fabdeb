@@ -1,5 +1,5 @@
 import re
-from io import StringIO
+from io import BytesIO
 from fabric.contrib.console import confirm
 from fabric.decorators import task
 from fabric.operations import sudo, prompt, get, put
@@ -45,11 +45,11 @@ def install_exim4():
         sudo('chown Debian-exim:Debian-exim {dkp} && chmod 700 {dkp}'.format(dkp=dkim_keys_path))
         dkim_selector = prompt('Set DKIM selector name', default='mail', validate=r'[\w]+')
         sudo('cp /etc/exim4/exim4.conf.template /etc/exim4/exim4.conf.template.bak')
-        t = StringIO()
+        t = BytesIO()
         get('/etc/exim4/exim4.conf.template', local_path=t, use_sudo=True)
-        t = StringIO(re.sub(
-            r'(# This transport is used for delivering messages over SMTP connections\.\n).*?'
-            r'(remote_smtp:.+?driver = smtp\n).+?(\.ifdef)',
+        t = BytesIO(re.sub(
+            br'(# This transport is used for delivering messages over SMTP connections\.\n).*?'
+            br'(remote_smtp:.+?driver = smtp\n).+?(\.ifdef)',
             r'\1\n'
             r'DKIM_DOMAIN_NAME = ${{lc:${{domain:$h_from:}}}}\n'
             r'DKIM_FILE = {dkp}/${{lc:${{domain:$h_from:}}}}.key\n'
@@ -58,7 +58,7 @@ def install_exim4():
             r'  dkim_domain = DKIM_DOMAIN_NAME\n'
             r'  dkim_selector = {dsn}\n'
             r'  dkim_private_key = DKIM_PRIV_KEY\n\n'
-            r'\3'.format(dkp=dkim_keys_path, dsn=dkim_selector),
+            r'\3'.format(dkp=dkim_keys_path, dsn=dkim_selector).encode(),
             t.getvalue(),
             flags=(re.M | re.S)
         ))
