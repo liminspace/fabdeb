@@ -156,7 +156,7 @@ def configure_timezone():
         tz = tz.strip()
         fn = '/usr/share/zoneinfo/{}'.format(tz)
         if ('.' not in tz and exists(fn, use_sudo=True) and
-                sudo('cat {}'.format(fn), quiet=True)[:4] == 'TZif'):
+                sudo('head -c 4 {}'.format(fn), quiet=True) == 'TZif'):
             return tz
         raise ValueError('Invalid timezone. See http://twiki.org/cgi-bin/xtra/tzdatepick.html')
 
