@@ -83,7 +83,6 @@ def install_ntp():
             ntp_server_list.append(t)
         return ntp_server_list
 
-    ntp_servers = None
     while True:
         ntp_servers = read_ntp_servers()
         print_yellow('You wrote following NTP-server list:\n    {}'.format(
