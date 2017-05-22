@@ -17,7 +17,7 @@ __all__ = ('install_postgresql', 'install_postgis', 'set_postgresql_user_passwor
 POSTGRESQL_REPOSITORIES = {
     'Debian GNU/Linux 8': {
         (
-            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7'
+            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8'
         ): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
     },
 }
@@ -26,7 +26,7 @@ POSTGRESQL_REPOSITORIES = {
 POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
     'Debian GNU/Linux 8': {
         (
-            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7'
+            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8'
         ): (
             'wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',
         ),
