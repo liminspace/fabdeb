@@ -17,13 +17,14 @@ __all__ = ('check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone
 
 
 SUPPORT_OS = {
-    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8')
+    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'),
+    # 'Debian GNU/Linux 9': ('9.0', '9.1', '9.2'),
 }
 
 
 OS_REPOSITORIES = {
     'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8'): (
+        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'): (
             'deb http://http.debian.net/debian jessie main contrib non-free\n'
             'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
             '\n'
@@ -34,6 +35,18 @@ OS_REPOSITORIES = {
             'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'
         ),
     },
+    # 'Debian GNU/Linux 9': {
+    #     ('9.0', '9.1', '9.2'): (
+    #         'deb http://deb.debian.org/debian stretch main contrib non-free\n'
+    #         'deb-src http://deb.debian.org/debian stretch main contrib non-free\n'
+    #         '\n'
+    #         'deb http://deb.debian.org/debian stretch-updates main contrib non-free\n'
+    #         'deb-src http://deb.debian.org/debian stretch-updates main contrib non-free\n'
+    #         '\n'
+    #         'deb http://security.debian.org/ stretch/updates main contrib non-free\n'
+    #         'deb-src http://security.debian.org/ stretch/updates main contrib non-free\n'
+    #     ),
+    # },
 }
 
 
@@ -137,8 +150,7 @@ def configure_hostname():
     append('/etc/hosts', '\n127.0.0.1\tlocalhost', use_sudo=True)
     append('/etc/hosts', '127.0.1.1\t{}'.format(nhn.split('.')[0]), use_sudo=True)
     append('/etc/hosts', '{}\t{}'.format(ip, nhn), use_sudo=True)
-    sudo('/etc/init.d/hostname.sh start')
-    sudo('hostname {}'.format(nhn))
+    sudo('hostname -F /etc/hostname')
     print_green('INFO: Configure hostname... OK')
 
 
