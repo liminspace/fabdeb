@@ -24,7 +24,7 @@ def prepare_server():
     Prepare server before a project deploy
     """
     check_sudo()
-    check_os()
+    os_name, os_ver = check_os()
     set_apt_repositories(OS_REPOSITORIES, OS_REPOS_INSTALL_KEYS_COMMANDS)
     update_locale()
     configure_hostname()
@@ -42,12 +42,19 @@ def prepare_server():
     if install_python3:
         apt_install('python3 python3-dev', comment='For Python3', noconfirm=for_python)
     apt_install(
-        'tk-dev python-tk python-imaging libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev '
-        'libtiff5-dev liblcms1-dev liblcms2-dev libwebp-dev libopenjpeg-dev openjpeg-tools '
-        'tcl8.6-dev tk8.6-dev libturbojpeg-dev libtiff-tools',
+        'tk-dev python-tk python-imaging libjpeg-dev zlib1g-dev libfreetype6-dev libpng-dev '
+        'libtiff5-dev libwebp-dev tcl8.6-dev tk8.6-dev libturbojpeg-dev libtiff-tools',
         comment='For Python Pillow or other image libraries',
         noconfirm=for_python
     )
+    addpacks = []
+    if os_name == 'Debian' and os_ver == '8':
+        addpacks.extend(['liblcms1-dev libtiff-dev libopenjpeg-dev openjpeg-tools'])
+    if os_name == 'Debian' and os_ver == '9':
+        addpacks.extend(['liblcms2-dev libtiff5-dev libopenjp2-7-dev libopenjp2-tools'])
+    if addpacks:
+        apt_install(' '.join(addpacks), comment='For Python Pillow or other image libraries (additional).',
+                    noconfirm=for_python)
     if install_python3:
         apt_install(
             'python3-tk',

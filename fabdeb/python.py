@@ -84,6 +84,6 @@ def configure_virtualenvwrapper_for_user(username, python_ver='2'):
             python_path = '/usr/bin/python{}'.format(get_python3_version())
         append(bashrc, 'export WORKON_HOME=$HOME/.virtualenvs', use_sudo=True)
         append(bashrc, 'export VIRTUALENVWRAPPER_HOOK_DIR=$WORKON_HOME', use_sudo=True)
-        append(bashrc, 'export export VIRTUALENVWRAPPER_PYTHON={}'.format(python_path), use_sudo=True)
+        append(bashrc, 'export VIRTUALENVWRAPPER_PYTHON={}'.format(python_path), use_sudo=True)
         append(bashrc, 'source /usr/local/bin/virtualenvwrapper.sh', use_sudo=True)
     print_green('INFO: Configure python {} virtualenvwrapper to user {}... OK'.format(python_ver, username))

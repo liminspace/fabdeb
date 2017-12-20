@@ -12,18 +12,25 @@ __all__ = ('install_nginx',)
 
 
 NGINX_REPOSITORIES = {
-    'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'): (
+    'Debian': {
+        '8': (
             'deb http://nginx.org/packages/debian/ jessie nginx\n'
             'deb-src http://nginx.org/packages/debian/ jessie nginx\n'
+        ),
+        '9': (
+            'deb http://nginx.org/packages/debian/ stretch nginx\n'
+            'deb-src http://nginx.org/packages/debian/ stretch nginx\n'
         ),
     },
 }
 
 
 NGINX_REPOS_INSTALL_KEYS_COMMANDS = {
-    'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'): (
+    'Debian': {
+        '8': (
+            'wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -',
+        ),
+        '9': (
             'wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -',
         ),
     },
@@ -65,7 +72,7 @@ def install_nginx():
              r'    gzip_min_length  1000;\n'
              r'    gzip_proxied     expired no-cache no-store private auth;\n'
              r'    gzip_types       text/plain text/javascript text/xml text/css application/x-javascript '
-             r'application/javascript application/xml image/svg+xml;\n'
+             r'application/javascript application/xml application/json image/svg+xml;\n'
              r'    gzip_disable     "msie6";\n'
              r'    gzip_vary        on;\n').format(gzl=gzl), use_sudo=True, backup='')
     print_green('INFO: Install nginx... OK')

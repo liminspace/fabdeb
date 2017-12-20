@@ -9,7 +9,7 @@ from fabdeb.tools import print_green
 __all__ = ('install_nodejs',)
 
 
-SUPPORT_NODEJS_VERSIONS = ('4', '6')
+SUPPORT_NODEJS_VERSIONS = ('4', '6', '8')
 
 
 # # # COMMANDS # # #

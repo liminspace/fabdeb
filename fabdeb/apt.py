@@ -6,26 +6,22 @@ from fabdeb.os import check_os, check_sudo
 from fabdeb.tools import print_green
 
 
-__all__ = ('apt_update', 'apt_upgrade', 'apt_dist_upgrade' 'apt_install', 'apt_cleanup')
+__all__ = ('apt_update', 'apt_upgrade', 'apt_dist_upgrade', 'apt_install', 'apt_cleanup')
 
 
 def get_apt_repositories_text(repos):
-    os_issue, os_ver = check_os()
-    t = repos.get(os_issue)
-    if t:
-        for versions, text in t.items():
-            if os_ver in versions:
-                return text
-    raise RuntimeError('Does not exists apt repositories for "{}" version "{}"'.format(os_issue, os_ver))
+    os_name, os_ver = check_os()
+    t = repos.get(os_name)
+    if t and os_ver in t:
+        return t[os_ver]
+    raise RuntimeError('Repositories for "{}" version "{}" do not exist.'.format(os_name, os_ver))
 
 
 def get_apt_repo_install_keys_commands(repos_install_keys_commands):
-    os_issue, os_ver = check_os()
-    t = repos_install_keys_commands.get(os_issue)
-    if t:
-        for versions, commands in t.items():
-            if os_ver in versions:
-                return commands
+    os_name, os_ver = check_os()
+    t = repos_install_keys_commands.get(os_name)
+    if t and os_ver in t:
+        return t[os_ver]
     return ()
 
 

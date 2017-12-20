@@ -15,30 +15,27 @@ __all__ = ('install_postgresql', 'install_postgis', 'set_postgresql_user_passwor
 
 
 POSTGRESQL_REPOSITORIES = {
-    'Debian GNU/Linux 8': {
-        (
-            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
-        ): 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
+    'Debian': {
+        '8': 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main\n',
+        '9': 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main\n',
     },
 }
 
 
 POSTGRESQL_REPOS_INSTALL_KEYS_COMMANDS = {
-    'Debian GNU/Linux 8': {
-        (
-            '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
-        ): (
-            'wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',
-        ),
+    'Debian': {
+        '8': ('wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',),
+        '9': ('wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -',),
     },
 }
 
 
-SUPPORT_POSTGRESQL_VERSIONS = ('9.4', '9.5', '9.6')
+SUPPORT_POSTGRESQL_VERSIONS = ('9.4', '9.5', '9.6', '10')
 SUPPORT_POSTGIS_VERSIONS = {  # by PostgreSQL version
-    '9.4': ('2.1', '2.2'),
-    '9.5': ('2.2', '2.3'),
-    '9.6': ('2.3',),
+    '9.4': ('2.3', '2.4'),
+    '9.5': ('2.3', '2.4'),
+    '9.6': ('2.3', '2.4'),
+    '10': ('2.4',),
 }
 
 
@@ -92,11 +89,11 @@ def install_postgis(postgres_ver=None, postgis_ver=None):
     Install PostGIS for PostgreSQL
     """
     assert postgres_ver in SUPPORT_POSTGRESQL_VERSIONS or postgres_ver is None
-    assert postgis_ver in ('2.1', '2.2') or postgis_ver is None
+    assert postgis_ver in ('2.3', '2.4') or postgis_ver is None
     if postgres_ver and postgis_ver and postgis_ver not in SUPPORT_POSTGIS_VERSIONS[postgres_ver]:
         AssertionError('Invalid postgis_ver {} for postgres_ver {}'.format(postgres_ver, postgis_ver))
     check_sudo()
-    check_os()
+    os_name, os_ver = check_os()
     if not confirm('Do you want to install GEOS, GDAL, PROJ.4 and PostGIS?'):
         return
     allow_versions = ', '.join(SUPPORT_POSTGRESQL_VERSIONS)
@@ -109,13 +106,14 @@ def install_postgis(postgres_ver=None, postgis_ver=None):
                              default=SUPPORT_POSTGIS_VERSIONS[postgres_ver][-1])
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}...'.format(postgis_ver,
                                                                                               postgres_ver))
-    apt_install('libgeos-dev libgeos-c1 libgeos++-dev libgeos-3.4.2', noconfirm=True)
-    apt_install('gdal-bin python-gdal libgdal-dev libgdal1-dev', noconfirm=True)
-    apt_install('libproj-dev libproj0', noconfirm=True)
-    # skip postgis because it install postgresql-9.6 and postgresql-9.6-postgis-2.3
+    packages = ['libgeos-dev libgeos++-dev gdal-bin python-gdal libproj-dev']
+    if os_name == 'Debian' and os_ver == '8':
+        packages.extend(['libgeos-c1 libgeos-3.4.2 libgdal-dev libgdal1-dev libproj0'])
+    if os_name == 'Debian' and os_ver == '9':
+        packages.extend(['libgeos-c1v5 libgeos-3.5.1 libgdal-dev libproj12'])
+    apt_install(' '.join(packages), noconfirm=True)
     apt_install('postgresql-{}-postgis-{}'.format(postgres_ver, postgis_ver), noconfirm=True)
-    apt_install('libgeoip1', noconfirm=True)
-    apt_install('spatialite-bin', noconfirm=True)
+    apt_install('libgeoip1 spatialite-bin', noconfirm=True)
     print_green('INFO: Install GEOS, GDAL, PROJ.4 and PostGIS {} for PostgreSQL {}... OK'.format(postgis_ver,
                                                                                                  postgres_ver))
 

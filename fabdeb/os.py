@@ -12,19 +12,19 @@ from fabric.utils import abort
 from fabdeb.tools import print_green, print_yellow, print_red
 
 
-__all__ = ('check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone', 'add_user', 'install_user_rsa_key',
-           'service_restart', 'server_reboot', 'update_locale')
+__all__ = ('check_os', 'check_sudo', 'setup_swap', 'configure_hostname', 'configure_timezone', 'add_user',
+           'install_user_rsa_key', 'service_restart', 'server_reboot', 'update_locale')
 
 
-SUPPORT_OS = {
-    'Debian GNU/Linux 8': ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'),
-    # 'Debian GNU/Linux 9': ('9.0', '9.1', '9.2'),
-}
+SUPPORT_OS = (
+    # os issue, major versions, os name
+    ('Debian GNU/Linux', ('8', '9'), 'Debian'),
+)
 
 
 OS_REPOSITORIES = {
-    'Debian GNU/Linux 8': {
-        ('8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'): (
+    'Debian': {
+        '8': (
             'deb http://http.debian.net/debian jessie main contrib non-free\n'
             'deb-src http://http.debian.net/debian jessie main contrib non-free\n'
             '\n'
@@ -34,19 +34,17 @@ OS_REPOSITORIES = {
             'deb http://security.debian.org/ jessie/updates main contrib non-free\n'
             'deb-src http://security.debian.org/ jessie/updates main contrib non-free\n'
         ),
+        '9': (
+            'deb http://deb.debian.org/debian stretch main contrib non-free\n'
+            'deb-src http://deb.debian.org/debian stretch main contrib non-free\n'
+            '\n'
+            'deb http://deb.debian.org/debian stretch-updates main contrib non-free\n'
+            'deb-src http://deb.debian.org/debian stretch-updates main contrib non-free\n'
+            '\n'
+            'deb http://security.debian.org/ stretch/updates main contrib non-free\n'
+            'deb-src http://security.debian.org/ stretch/updates main contrib non-free\n'
+        ),
     },
-    # 'Debian GNU/Linux 9': {
-    #     ('9.0', '9.1', '9.2'): (
-    #         'deb http://deb.debian.org/debian stretch main contrib non-free\n'
-    #         'deb-src http://deb.debian.org/debian stretch main contrib non-free\n'
-    #         '\n'
-    #         'deb http://deb.debian.org/debian stretch-updates main contrib non-free\n'
-    #         'deb-src http://deb.debian.org/debian stretch-updates main contrib non-free\n'
-    #         '\n'
-    #         'deb http://security.debian.org/ stretch/updates main contrib non-free\n'
-    #         'deb-src http://security.debian.org/ stretch/updates main contrib non-free\n'
-    #     ),
-    # },
 }
 
 
@@ -69,18 +67,27 @@ def check_os():
         return env._fd_checked_os_
     print_green('INFO: Check your OS...')
     remote_os_issue = sudo('cat /etc/issue', quiet=True)
-    os_issue = os_ver = ok = None
-    for os_issue, os_ver in SUPPORT_OS.items():
-        if os_issue in remote_os_issue:
-            ok = True
-            break
+    if remote_os_issue.failed:
+        remote_os_issue = ''
+    remote_os_issue = remote_os_issue.replace('\\n', '').replace('\\l', '').strip()
+    remote_os_name = allow_versions = ok = None
+    if remote_os_issue:
+        for os_issue, versions, os_name in SUPPORT_OS:
+            if os_issue in remote_os_issue:
+                remote_os_name = os_name
+                allow_versions = versions
+                ok = True
+                break
     if not ok:
         abort('Your OS "{}" is not supported :('.format(remote_os_issue))
-    remote_os_ver = sudo('cat /etc/debian_version', quiet=True).strip()
-    if remote_os_ver not in os_ver:
+    remote_os_ver = sudo('cat /etc/debian_version', quiet=True)
+    if remote_os_ver.failed:
+        remote_os_ver = ''
+    remote_os_ver = remote_os_ver.split('.', 1)[0].strip()
+    if remote_os_ver not in allow_versions:
         abort('Your OS "{}" version "{}" is not supported :('.format(remote_os_issue, remote_os_ver))
     print_green('INFO: Check your OS... OK')
-    env._fd_checked_os_ = os_issue, remote_os_ver
+    env._fd_checked_os_ = remote_os_name, remote_os_ver
     return env._fd_checked_os_
 
 
