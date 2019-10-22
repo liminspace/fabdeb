@@ -4,5 +4,5 @@ wheel
 twine
 
 pycrypto==2.6.1
-paramiko==2.3.1
+paramiko==2.3.3
 fabric==1.14.0

@@ -3,5 +3,5 @@ setuptools
 wheel
 twine
 
-paramiko==2.3.1
+paramiko==2.3.3
 fabric3==1.13.1.post1
